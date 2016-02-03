@@ -68,6 +68,46 @@ class CPKeyboardStateObserver {
     let keyboardAnimationTime = 0.5
     
     
+    struct KeyboardFrameDictionaryKey {
+        static let Begin                                        = "UIKeyboardFrameBeginUserInfoKey"
+        static let End                                          = "UIKeyboardFrameEndUserInfoKey"
+        static let AnimationDuration                            = "UIKeyboardAnimationDurationUserInfoKey"
+        static let CPKeyboardStateObserverNewFrameKey           = "HPSKeyboardStateObserverNewKeyboardFrameKey"
+        static let CPKeyboardStateObserverOriginalKeyboardFrame = "HPSKeyboardStateObserverOriginalKeyboardFrameKey"
+    }
+    
+    
+    struct KeyboardStateDefinition {
+        
+        static var isKeyboardAtBottom: Bool?
+        static var isKeyboardDetached: Bool?
+        static var isKeyboardHidden: Bool?
+        static var isKeyboardVisible: Bool?
+        
+        
+        static func calculateKeyboardPosition(userInfo: [NSObject : AnyObject]) {
+            
+            guard let endFrame: CGRect = userInfo[KeyboardFrameDictionaryKey.End]?.CGRectValue else {
+                return
+            }
+            
+            let keyboardY = endFrame.origin.y
+            let keyboardHeight = endFrame.size.height
+            
+            let screenHeight = UIScreen.mainScreen().bounds.size.height
+            
+            isKeyboardAtBottom = keyboardY == (screenHeight - keyboardHeight)
+            isKeyboardDetached = (keyboardY + keyboardHeight) < screenHeight
+            isKeyboardHidden = keyboardY == screenHeight
+            isKeyboardVisible = keyboardY < screenHeight
+        }
+        
+        static func isDataValid() -> Bool {
+            return (isKeyboardAtBottom != nil && isKeyboardDetached != nil && isKeyboardHidden != nil && isKeyboardVisible != nil)
+        }
+    }
+    
+    
     enum KeyboardObserverState: Int {
         case Hidden
         case ShownDocked
@@ -75,6 +115,12 @@ class CPKeyboardStateObserver {
         case HiddenUndocked
         case ShownSplit
         case HiddenSplit
+    }
+    
+    
+    enum KeyboardObserverCaller: Int {
+        case KeyboardObserverCallerWillChange
+        case KeyboardObserverCallerDidChange
     }
     
     
@@ -169,6 +215,105 @@ class CPKeyboardStateObserver {
         assert(self.delegate != nil || (self.blockForStateHide != nil && self.blockForStateHide != nil && self.blockForStateShow != nil && self.blockForStateWillMove != nil), "KeyboardStateObserver delegate or block not set")
         
         self.addObserver()
+    }
+    
+    
+    /// MARK: - Keyboard Notification events methods
+    
+    
+    func keyboardWillChangeFrame(notification: NSNotification) {
+        
+        guard let userInfo = notification.userInfo else {
+            print("notification doesn't contain a userInfo dictionary")
+            return
+        }
+        
+        self.calculateNextState(userInfo, caller: .KeyboardObserverCallerWillChange)
+    }
+    
+    
+    func keyboardDidChangeFrame(notification: NSNotification) {
+        
+        guard let userInfo = notification.userInfo else {
+            print("notification doesn't contain a userInfo dictionary")
+            return
+        }
+        
+        self.calculateNextState(userInfo, caller: .KeyboardObserverCallerDidChange)
+    }
+    
+    
+    func calculateNextState(userInfo: [NSObject : AnyObject], caller: KeyboardObserverCaller) {
+        
+        KeyboardStateDefinition.calculateKeyboardPosition(userInfo)
+        
+        if KeyboardStateDefinition.isDataValid() {
+            
+            self.previousKeyboardState = self.currentKeyboardState
+            
+            guard let currentKeyboardState = self.currentKeyboardState else {
+                print("currentKeyboardState is nil")
+                return
+            }
+            
+            switch currentKeyboardState {
+            
+            // keyboard is hidden
+            case .Hidden:
+                
+                if KeyboardStateDefinition.isKeyboardAtBottom! {
+                    self.currentKeyboardState = .ShownDocked
+                }
+                else if KeyboardStateDefinition.isKeyboardDetached! {
+                    self.currentKeyboardState = .ShownUndocked
+                }
+                
+                break
+            
+            // keyboard is being displayed
+            case .ShownDocked:
+                
+                if KeyboardStateDefinition.isKeyboardDetached! {
+                    self.currentKeyboardState = .ShownUndocked
+                }
+                else if KeyboardStateDefinition.isKeyboardHidden! {
+                    self.currentKeyboardState = .Hidden
+                }
+                
+                break
+            
+            // keyboard is being displayed (split)
+            case .ShownUndocked:
+                
+                if KeyboardStateDefinition.isKeyboardHidden! {
+                    self.currentKeyboardState = .HiddenUndocked
+                }
+                else if KeyboardStateDefinition.isKeyboardAtBottom! && KeyboardStateDefinition.isKeyboardVisible! {
+                    self.currentKeyboardState = .ShownUndocked
+                }
+                
+                break
+            
+            // keyboard gets hidden after being displayed (split)
+            case .HiddenUndocked:
+                
+                if KeyboardStateDefinition.isKeyboardDetached! {
+                    self.currentKeyboardState = .ShownUndocked
+                }
+                
+                break
+            default:
+                break
+            }
+            
+            let newFrameDictionary = self.createDictionary(userInfo)
+            self.executeCodeForCurrentState(newFrameDictionary caller:caller)
+        }
+        
+//        #define KEYBOARD_AT_BOTTOM  keyboardY == (screenHeight - keyboardHeight)
+//        #define KEYBOARD_LOOSE      keyboardY + keyboardHeight) < screenHeight
+//        #define KEYBOARD_HIDDEN     keyboardY == screenHeight
+//        #define KEYBOARD_VISIBLE    keyboardY < screenHeight
     }
     
     
