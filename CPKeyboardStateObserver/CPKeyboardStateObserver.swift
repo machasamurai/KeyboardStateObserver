@@ -309,13 +309,151 @@ class CPKeyboardStateObserver {
             let newFrameDictionary = self.createDictionary(userInfo)
             self.executeCodeForCurrentState(newFrameDictionary caller:caller)
         }
-        
-//        #define KEYBOARD_AT_BOTTOM  keyboardY == (screenHeight - keyboardHeight)
-//        #define KEYBOARD_LOOSE      keyboardY + keyboardHeight) < screenHeight
-//        #define KEYBOARD_HIDDEN     keyboardY == screenHeight
-//        #define KEYBOARD_VISIBLE    keyboardY < screenHeight
     }
     
+    
+    private func createDictionary(userInfo: [NSObject : AnyObject]) -> [String : AnyObject]? {
+        
+        let screenHeight = UIScreen.mainScreen().bounds.size.height
+        
+        guard var newFrame = userInfo[KeyboardFrameDictionaryKey.End]?.CGRectValue else {
+            return nil
+        }
+        
+        let keyboardY: CGFloat = newFrame.origin.y
+        
+        let spaceBetweenKeyboardStartAndScreenEnd: CGFloat = (screenHeight - keyboardY)
+        var fixedKeyboardHeight: CGFloat = newFrame.size.height
+        
+        // fix keyboard data (e.g. set the height of the keyboard to '0' when hidden)
+        if spaceBetweenKeyboardStartAndScreenEnd <= 0 {
+            fixedKeyboardHeight = 0.0
+        }
+        else if spaceBetweenKeyboardStartAndScreenEnd < newFrame.size.height {
+            fixedKeyboardHeight = spaceBetweenKeyboardStartAndScreenEnd
+        }
+        
+        if fixedKeyboardHeight != newFrame.size.height {
+            newFrame.size.height = fixedKeyboardHeight
+        }
+        
+        let newFrameDictionary: [String : AnyObject] = [KeyboardFrameDictionaryKey.CPKeyboardStateObserverNewFrameKey : NSValue(CGRect: newFrame), KeyboardFrameDictionaryKey.CPKeyboardStateObserverOriginalKeyboardFrame : userInfo]
+        
+        return newFrameDictionary
+    }
+    
+    /*
+    - (void)executeCodeForCurrentState:(NSDictionary *)userInfo caller:(NSInteger)caller
+    {
+    // 前の状況と現在の状況を見て、コードを実行する
+    switch (self.currentKeyboardState) {
+    case keyboardObserverStateHidden:
+    case keyboardObserverStateHiddenUndocked:
+    case keyboardObserverStateHiddenSplit:
+    // 非表示のイベント
+    if(self.delegate){
+    if([self.delegate respondsToSelector:@selector(keyboardStateObserver:keyboardWillHide:)]){
+    [self.delegate keyboardStateObserver:self keyboardWillHide:userInfo];
+    }
+    }
+    else{
+    self.blockForStateHide(userInfo);
+    }
+    
+    self.hasKeyboardJustDocked = NO;
+    
+    break;
+    
+    case keyboardObserverStateShownDocked:
+    // スクリーンのしたに戻るイベント
+    if(self.previousKeyboardState == keyboardObserverStateShownUndocked
+    || self.previousKeyboardState == keyboardObserverStateShownSplit){
+    
+    if(self.delegate){
+    if([self.delegate respondsToSelector:@selector(keyboardStateObserver:keyboardWillDock:)]){
+    [self.delegate keyboardStateObserver:self keyboardWillDock:userInfo];
+    }
+    }
+    else{
+    self.blockForStateDockEvent(userInfo);
+    }
+    
+    self.hasKeyboardJustUndocked = NO;
+    self.hasKeyboardJustDocked = YES;
+    }
+    else{
+    if(self.hasKeyboardJustDocked){
+    return;
+    }
+    if(self.delegate){
+    if([self.delegate respondsToSelector:@selector(keyboardStateObserver:keyboardWillShow:)]){
+    [self.delegate keyboardStateObserver:self keyboardWillShow:userInfo];
+    }
+    }
+    else{
+    self.blockForStateShow(userInfo);
+    }
+    }
+    
+    break;
+    
+    case keyboardObserverStateShownUndocked:
+    case keyboardObserverStateShownSplit:
+    
+    // undock（外れる）のイベント
+    if(self.previousKeyboardState == keyboardObserverStateShownDocked){
+    if(self.delegate){
+    if([self.delegate respondsToSelector:@selector(keyboardStateObserver:keyboardWillUndock:)]){
+    [self.delegate keyboardStateObserver:self keyboardWillUndock:userInfo];
+    }
+    }
+    else{
+    self.blockForStateUndockEvent(userInfo);
+    }
+    
+    self.hasKeyboardJustDocked = NO;
+    self.hasKeyboardJustUndocked = YES;
+    }
+    // キーボードは外れているままで動いた
+    else{
+    if(caller == keyboardObserverCallerWillChange){
+    if(self.delegate){
+    if([self.delegate respondsToSelector:@selector(keyboardStateObserver:keyboardWillMove:)]){
+    [self.delegate keyboardStateObserver:self keyboardWillMove:userInfo];
+    }
+    }
+    else{
+    self.blockForStateWillMove(userInfo);
+    }
+    
+    self.hasKeyboardJustUndocked = NO;
+    }
+    else{
+    if(self.hasKeyboardJustUndocked){
+    if(self.isOSVersion8){
+    return;
+    }
+    
+    self.hasKeyboardJustUndocked = NO;
+    return;
+    }
+    
+    if(self.delegate){
+    if([self.delegate respondsToSelector:@selector(keyboardStateObserver:keyboardDidMove:)]){
+    [self.delegate keyboardStateObserver:self keyboardDidMove:userInfo];
+    }
+    }
+    else{
+    self.blockForStateDidMove(userInfo);
+    }
+    }
+    }
+    
+    default:
+    break;
+    }
+    }
+    */
     
     func delay(delay:Double, closure:()->()) {
         dispatch_after(
