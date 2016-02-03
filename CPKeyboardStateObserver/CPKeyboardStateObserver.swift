@@ -9,39 +9,39 @@
 import Foundation
 import UIKit
 
-typealias BlockForState = (keyboardDictionary: [String : String]) -> Void
+typealias BlockForState = (keyboardDictionary: [NSObject : AnyObject]) -> Void
 
 protocol CPKeyboardObserverDelegate: class {
     
     /// 'Keyboard will hide' event.
     /// @param  CPKeyboardStateObserver instance.
     /// @param  Dictionary that contains the keyboard frame values.
-    func keyboardWillHide(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [String : String])
+    func keyboardWillHide(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject])
     
     /// 'Keyboard will show' event.
     /// @param  CPKeyboardStateObserver instance.
     /// @param  Dictionary that contains the keyboard frame values.
-    func keyboardWillShow(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [String : String])
+    func keyboardWillShow(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject])
     
     /// 'Keyboard will undock' event. The keyboard detaches from the bottom of the screen.
     /// @param  CPKeyboardStateObserver instance.
     /// @param  Dictionary that contains the keyboard frame values.
-    func keyboardWillUndock(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [String : String])
+    func keyboardWillUndock(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject])
     
     /// 'Keyboard will dock event. The keyboard attaches to the bottom of the screen.
     /// @param  CPKeyboardStateObserver instance.
     /// @param  Dictionary that contains the keyboard frame values.
-    func keyboardWillDock(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [String : String])
+    func keyboardWillDock(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject])
     
     /// 'Keyboard will move' event. The keyboard will be moved by the user while being detached from the bottom of the screen.
     /// @param  CPKeyboardStateObserver instance.
     /// @param  Dictionary that contains the keyboard frame values.
-    func keyboardWillMove(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [String : String])
+    func keyboardWillMove(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject])
     
     /// 'Keyboard did move' event. The keyboard was moved by the user while being detached from the bottom of the screen.
     /// @param  CPKeyboardStateObserver instance.
     /// @param  Dictionary that contains the keyboard frame values.
-    func keyboardDidMove(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [String : String])
+    func keyboardDidMove(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject])
 }
 
 class CPKeyboardStateObserver {
@@ -312,7 +312,7 @@ class CPKeyboardStateObserver {
     }
     
     
-    private func createDictionary(userInfo: [NSObject : AnyObject]) -> [String : AnyObject]? {
+    private func createDictionary(userInfo: [NSObject : AnyObject]) -> [NSObject : AnyObject]? {
         
         let screenHeight = UIScreen.mainScreen().bounds.size.height
         
@@ -337,33 +337,69 @@ class CPKeyboardStateObserver {
             newFrame.size.height = fixedKeyboardHeight
         }
         
-        let newFrameDictionary: [String : AnyObject] = [KeyboardFrameDictionaryKey.CPKeyboardStateObserverNewFrameKey : NSValue(CGRect: newFrame), KeyboardFrameDictionaryKey.CPKeyboardStateObserverOriginalKeyboardFrame : userInfo]
+        let newFrameDictionary: [NSObject : AnyObject] = [KeyboardFrameDictionaryKey.CPKeyboardStateObserverNewFrameKey : NSValue(CGRect: newFrame), KeyboardFrameDictionaryKey.CPKeyboardStateObserverOriginalKeyboardFrame : userInfo]
         
         return newFrameDictionary
     }
     
+    
+    private func executeCodeForCurrentState(userInfo: [NSObject : AnyObject], caller: KeyboardObserverCaller) {
+        
+        // execute the corresponding code for the current and previous state
+        switch self.currentKeyboardState! {
+            
+        case .Hidden: fallthrough
+        case .HiddenUndocked: fallthrough
+        case .HiddenSplit:
+            
+            // hide event
+            if self.delegate != nil {
+                self.delegate.keyboardWillHide(self, keyboardInfo: userInfo)
+            }
+            else {
+                self.blockForStateHide(keyboardDictionary: userInfo)
+            }
+        
+            self.hasKeyboardJustDocked = false
+            
+            break
+            
+        case KeyboardObserverState.ShownDocked:
+            // keyboard returns to the bottom of the screen
+            if self.previousKeyboardState == KeyboardObserverState.ShownUndocked ||
+                self.previousKeyboardState == KeyboardObserverState.ShownSplit {
+                    
+                if self.delegate != nil {
+                    self.delegate.keyboardWillDock(self, keyboardInfo: userInfo)
+                }
+                else {
+                    self.blockForStateDock(keyboardDictionary: userInfo)
+                }
+            
+                self.hasKeyboardJustUndocked = false
+                self.hasKeyboardJustDocked = true
+            
+                break
+            }
+            else {
+                if self.hasKeyboardJustDocked {
+                    return
+                }
+            
+                if self.delegate != nil {
+                    self.delegate.keyboardWillShow(self, keyboardInfo: userInfo)
+                }
+                else {
+                    self.blockForStateShow(keyboardDictionary: userInfo)
+                }
+            }
+        
+            break
+        }
+    
     /*
     - (void)executeCodeForCurrentState:(NSDictionary *)userInfo caller:(NSInteger)caller
     {
-    // 前の状況と現在の状況を見て、コードを実行する
-    switch (self.currentKeyboardState) {
-    case keyboardObserverStateHidden:
-    case keyboardObserverStateHiddenUndocked:
-    case keyboardObserverStateHiddenSplit:
-    // 非表示のイベント
-    if(self.delegate){
-    if([self.delegate respondsToSelector:@selector(keyboardStateObserver:keyboardWillHide:)]){
-    [self.delegate keyboardStateObserver:self keyboardWillHide:userInfo];
-    }
-    }
-    else{
-    self.blockForStateHide(userInfo);
-    }
-    
-    self.hasKeyboardJustDocked = NO;
-    
-    break;
-    
     case keyboardObserverStateShownDocked:
     // スクリーンのしたに戻るイベント
     if(self.previousKeyboardState == keyboardObserverStateShownUndocked
