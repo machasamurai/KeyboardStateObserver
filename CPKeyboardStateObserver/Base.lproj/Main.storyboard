@@ -18,8 +18,22 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uiK-U2-jkD">
+                                <rect key="frame" x="28" y="20" width="42" height="30"/>
+                                <state key="normal" title="Pause"/>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Qxg-6C-gXz">
+                                <rect key="frame" x="518" y="20" width="62" height="30"/>
+                                <state key="normal" title="Delegate"/>
+                            </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Tj6-ym-blA">
+                                <rect key="frame" x="279" y="571.5" width="42" height="20.5"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="wUj-oZ-ygW">
-                                <rect key="frame" x="20" y="28" width="560" height="544"/>
+                                <rect key="frame" x="20" y="58" width="560" height="484"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
@@ -27,12 +41,34 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="uiK-U2-jkD" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="8" id="0RT-rd-y9J"/>
+                            <constraint firstItem="wUj-oZ-ygW" firstAttribute="top" secondItem="uiK-U2-jkD" secondAttribute="bottom" constant="8" symbolic="YES" id="25X-7L-Mkr"/>
                             <constraint firstItem="wUj-oZ-ygW" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="8" symbolic="YES" id="4s0-79-VOX"/>
+                            <constraint firstItem="Qxg-6C-gXz" firstAttribute="centerY" secondItem="uiK-U2-jkD" secondAttribute="centerY" id="8Zj-ey-eVB"/>
                             <constraint firstItem="wUj-oZ-ygW" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="9lN-qu-oUf"/>
                             <constraint firstItem="wUj-oZ-ygW" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="Egn-46-XOt"/>
+                            <constraint firstItem="uiK-U2-jkD" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="Mpd-Wx-1VD"/>
+                            <constraint firstItem="Tj6-ym-blA" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="VeT-gc-jVM"/>
                             <constraint firstItem="wUj-oZ-ygW" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="afw-nd-tbf"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="Tj6-ym-blA" secondAttribute="bottom" constant="8" id="fuo-PG-DTy"/>
+                            <constraint firstItem="Qxg-6C-gXz" firstAttribute="leading" secondItem="uiK-U2-jkD" secondAttribute="trailing" constant="211" id="gCG-r8-iRn"/>
+                            <constraint firstItem="uiK-U2-jkD" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="nKS-xb-xDk"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="Qxg-6C-gXz" secondAttribute="trailing" id="udW-gI-8Qz"/>
                         </constraints>
+                        <variation key="default">
+                            <mask key="constraints">
+                                <exclude reference="4s0-79-VOX"/>
+                                <exclude reference="nKS-xb-xDk"/>
+                                <exclude reference="gCG-r8-iRn"/>
+                            </mask>
+                        </variation>
                     </view>
+                    <connections>
+                        <outlet property="functionButton" destination="Qxg-6C-gXz" id="Oc2-eJ-yCS"/>
+                        <outlet property="pauseButton" destination="uiK-U2-jkD" id="qBw-Ow-6QW"/>
+                        <outlet property="stateLabel" destination="Tj6-ym-blA" id="NUV-pM-za9"/>
+                        <outlet property="textView" destination="wUj-oZ-ygW" id="hvQ-dB-WJp"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
