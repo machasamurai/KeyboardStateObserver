@@ -306,8 +306,11 @@ class CPKeyboardStateObserver {
                 break
             }
             
-            let newFrameDictionary = self.createDictionary(userInfo)
-            self.executeCodeForCurrentState(newFrameDictionary caller:caller)
+            guard let newFrameDictionary = self.createDictionary(userInfo) else {
+                return
+            }
+            
+            self.executeCodeForCurrentState(newFrameDictionary, caller: caller)
         }
     }
     
@@ -364,7 +367,7 @@ class CPKeyboardStateObserver {
             
             break
             
-        case KeyboardObserverState.ShownDocked:
+        case .ShownDocked:
             // keyboard returns to the bottom of the screen
             if self.previousKeyboardState == KeyboardObserverState.ShownUndocked ||
                 self.previousKeyboardState == KeyboardObserverState.ShownSplit {
@@ -395,101 +398,52 @@ class CPKeyboardStateObserver {
             }
         
             break
+        
+        case .ShownUndocked: fallthrough
+        case .ShownSplit:
+            
+            // detach event
+            if self.previousKeyboardState == KeyboardObserverState.ShownDocked {
+                if self.delegate != nil {
+                    self.delegate.keyboardWillUndock(self, keyboardInfo: userInfo)
+                }
+                else {
+                    self.blockForStateUndock(keyboardDictionary: userInfo)
+                }
+                
+                self.hasKeyboardJustDocked = false
+                self.hasKeyboardJustUndocked = true
+            }
+            // the keyboard moved while being detached
+            else {
+                if caller == KeyboardObserverCaller.KeyboardObserverCallerWillChange {
+                    if self.delegate != nil {
+                        self.delegate.keyboardWillMove(self, keyboardInfo: userInfo)
+                    }
+                    else {
+                        self.blockForStateWillMove(keyboardDictionary: userInfo)
+                    }
+                
+                    self.hasKeyboardJustUndocked = false
+                }
+                else {
+                    if self.hasKeyboardJustUndocked {
+                        return
+                    }
+                
+                    self.hasKeyboardJustUndocked = false
+                    return
+                }
+                
+                if self.delegate != nil {
+                    self.delegate.keyboardDidMove(self, keyboardInfo: userInfo)
+                }
+                else {
+                    self.blockForStateDidMove(keyboardDictionary: userInfo)
+                }
+            }
         }
-    
-    /*
-    - (void)executeCodeForCurrentState:(NSDictionary *)userInfo caller:(NSInteger)caller
-    {
-    case keyboardObserverStateShownDocked:
-    // スクリーンのしたに戻るイベント
-    if(self.previousKeyboardState == keyboardObserverStateShownUndocked
-    || self.previousKeyboardState == keyboardObserverStateShownSplit){
-    
-    if(self.delegate){
-    if([self.delegate respondsToSelector:@selector(keyboardStateObserver:keyboardWillDock:)]){
-    [self.delegate keyboardStateObserver:self keyboardWillDock:userInfo];
     }
-    }
-    else{
-    self.blockForStateDockEvent(userInfo);
-    }
-    
-    self.hasKeyboardJustUndocked = NO;
-    self.hasKeyboardJustDocked = YES;
-    }
-    else{
-    if(self.hasKeyboardJustDocked){
-    return;
-    }
-    if(self.delegate){
-    if([self.delegate respondsToSelector:@selector(keyboardStateObserver:keyboardWillShow:)]){
-    [self.delegate keyboardStateObserver:self keyboardWillShow:userInfo];
-    }
-    }
-    else{
-    self.blockForStateShow(userInfo);
-    }
-    }
-    
-    break;
-    
-    case keyboardObserverStateShownUndocked:
-    case keyboardObserverStateShownSplit:
-    
-    // undock（外れる）のイベント
-    if(self.previousKeyboardState == keyboardObserverStateShownDocked){
-    if(self.delegate){
-    if([self.delegate respondsToSelector:@selector(keyboardStateObserver:keyboardWillUndock:)]){
-    [self.delegate keyboardStateObserver:self keyboardWillUndock:userInfo];
-    }
-    }
-    else{
-    self.blockForStateUndockEvent(userInfo);
-    }
-    
-    self.hasKeyboardJustDocked = NO;
-    self.hasKeyboardJustUndocked = YES;
-    }
-    // キーボードは外れているままで動いた
-    else{
-    if(caller == keyboardObserverCallerWillChange){
-    if(self.delegate){
-    if([self.delegate respondsToSelector:@selector(keyboardStateObserver:keyboardWillMove:)]){
-    [self.delegate keyboardStateObserver:self keyboardWillMove:userInfo];
-    }
-    }
-    else{
-    self.blockForStateWillMove(userInfo);
-    }
-    
-    self.hasKeyboardJustUndocked = NO;
-    }
-    else{
-    if(self.hasKeyboardJustUndocked){
-    if(self.isOSVersion8){
-    return;
-    }
-    
-    self.hasKeyboardJustUndocked = NO;
-    return;
-    }
-    
-    if(self.delegate){
-    if([self.delegate respondsToSelector:@selector(keyboardStateObserver:keyboardDidMove:)]){
-    [self.delegate keyboardStateObserver:self keyboardDidMove:userInfo];
-    }
-    }
-    else{
-    self.blockForStateDidMove(userInfo);
-    }
-    }
-    }
-    
-    default:
-    break;
-    }
-    }
-    */
     
     func delay(delay:Double, closure:()->()) {
         dispatch_after(
