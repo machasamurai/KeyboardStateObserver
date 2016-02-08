@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-typealias BlockForState = (keyboardDictionary: [NSObject : AnyObject]) -> Void
+typealias BlockForState = (keyboardInfo: [NSObject : AnyObject]) -> Void
 
 protocol CPKeyboardObserverDelegate: class {
     
@@ -44,6 +44,14 @@ protocol CPKeyboardObserverDelegate: class {
     func keyboardDidMove(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject])
 }
 
+struct KeyboardFrameDictionaryKey {
+    static let Begin                                        = "UIKeyboardFrameBeginUserInfoKey"
+    static let End                                          = "UIKeyboardFrameEndUserInfoKey"
+    static let AnimationDuration                            = "UIKeyboardAnimationDurationUserInfoKey"
+    static let CPKeyboardStateObserverNewFrameKey           = "HPSKeyboardStateObserverNewKeyboardFrameKey"
+    static let CPKeyboardStateObserverOriginalKeyboardFrame = "HPSKeyboardStateObserverOriginalKeyboardFrameKey"
+}
+
 class CPKeyboardStateObserver {
     
     static let sharedObserver = CPKeyboardStateObserver()
@@ -66,15 +74,6 @@ class CPKeyboardStateObserver {
     var isObserving: Bool = false
     
     let keyboardAnimationTime = 0.5
-    
-    
-    struct KeyboardFrameDictionaryKey {
-        static let Begin                                        = "UIKeyboardFrameBeginUserInfoKey"
-        static let End                                          = "UIKeyboardFrameEndUserInfoKey"
-        static let AnimationDuration                            = "UIKeyboardAnimationDurationUserInfoKey"
-        static let CPKeyboardStateObserverNewFrameKey           = "HPSKeyboardStateObserverNewKeyboardFrameKey"
-        static let CPKeyboardStateObserverOriginalKeyboardFrame = "HPSKeyboardStateObserverOriginalKeyboardFrameKey"
-    }
     
     
     struct KeyboardStateDefinition {
@@ -360,7 +359,7 @@ class CPKeyboardStateObserver {
                 self.delegate.keyboardWillHide(self, keyboardInfo: userInfo)
             }
             else {
-                self.blockForStateHide(keyboardDictionary: userInfo)
+                self.blockForStateHide(keyboardInfo: userInfo)
             }
         
             self.hasKeyboardJustDocked = false
@@ -376,7 +375,7 @@ class CPKeyboardStateObserver {
                     self.delegate.keyboardWillDock(self, keyboardInfo: userInfo)
                 }
                 else {
-                    self.blockForStateDock(keyboardDictionary: userInfo)
+                    self.blockForStateDock(keyboardInfo: userInfo)
                 }
             
                 self.hasKeyboardJustUndocked = false
@@ -393,7 +392,7 @@ class CPKeyboardStateObserver {
                     self.delegate.keyboardWillShow(self, keyboardInfo: userInfo)
                 }
                 else {
-                    self.blockForStateShow(keyboardDictionary: userInfo)
+                    self.blockForStateShow(keyboardInfo: userInfo)
                 }
             }
         
@@ -408,7 +407,7 @@ class CPKeyboardStateObserver {
                     self.delegate.keyboardWillUndock(self, keyboardInfo: userInfo)
                 }
                 else {
-                    self.blockForStateUndock(keyboardDictionary: userInfo)
+                    self.blockForStateUndock(keyboardInfo: userInfo)
                 }
                 
                 self.hasKeyboardJustDocked = false
@@ -421,7 +420,7 @@ class CPKeyboardStateObserver {
                         self.delegate.keyboardWillMove(self, keyboardInfo: userInfo)
                     }
                     else {
-                        self.blockForStateWillMove(keyboardDictionary: userInfo)
+                        self.blockForStateWillMove(keyboardInfo: userInfo)
                     }
                 
                     self.hasKeyboardJustUndocked = false
@@ -439,7 +438,7 @@ class CPKeyboardStateObserver {
                     self.delegate.keyboardDidMove(self, keyboardInfo: userInfo)
                 }
                 else {
-                    self.blockForStateDidMove(keyboardDictionary: userInfo)
+                    self.blockForStateDidMove(keyboardInfo: userInfo)
                 }
             }
         }

@@ -8,12 +8,13 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, CPKeyboardObserverDelegate {
     
     @IBOutlet weak var textView: UITextView!
     @IBOutlet weak var stateLabel: UILabel!
     @IBOutlet weak var pauseButton: UIButton!
     @IBOutlet weak var functionButton: UIButton!
+    @IBOutlet weak var stateLabelBottomConstraint: NSLayoutConstraint!
     
     var blockForStateHide: BlockForState!
     var blockForStateShow: BlockForState!
@@ -22,9 +23,19 @@ class ViewController: UIViewController {
     var blockForStateWillMove: BlockForState!
     var blockForStateDidMove: BlockForState!
     
+    var mode: ObservationMode!
+    
+    var observationModeStringArray = ["delegate", "block"]
+    
+    enum ObservationMode: Int {
+        case Block
+        case Delegate
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.mode = .Delegate
         
         // ブロックを用意する
         self.initData()
@@ -62,44 +73,105 @@ class ViewController: UIViewController {
     
     private func initData() {
         
-        self.blockForStateHide = { (keyboardDictionary: [NSObject : AnyObject]) -> Void in
+        self.blockForStateHide = { (keyboardInfo: [NSObject : AnyObject]) -> Void in
             self.stateLabel.text = "blockDidHide"
-            self.moveLabel(keyboardDictionary, shouldFollowKeyboard: true)
+            self.moveLabel(keyboardInfo, shouldFollowKeyboard: true)
         }
         
-        self.blockForStateShow = { (keyboardDictionary: [NSObject : AnyObject]) -> Void in
+        self.blockForStateShow = { (keyboardInfo: [NSObject : AnyObject]) -> Void in
             self.stateLabel.text = "blockDidShow"
-            self.moveLabel(keyboardDictionary, shouldFollowKeyboard: true)
+            self.moveLabel(keyboardInfo, shouldFollowKeyboard: true)
         }
         
-        self.blockForStateUndockEvent = { (keyboardDictionary: [NSObject : AnyObject]) -> Void in
-            self.stateLabel.text = "blockDiUndock"
-            self.moveLabel(keyboardDictionary, shouldFollowKeyboard: true)
+        self.blockForStateUndockEvent = { (keyboardInfo: [NSObject : AnyObject]) -> Void in
+            self.stateLabel.text = "blockDidUndock"
+            self.moveLabel(keyboardInfo, shouldFollowKeyboard: true)
         }
         
-        self.blockForStateDockEvent = { (keyboardDictionary: [NSObject : AnyObject]) -> Void in
+        self.blockForStateDockEvent = { (keyboardInfo: [NSObject : AnyObject]) -> Void in
             self.stateLabel.text = "blockDidDock"
-            self.moveLabel(keyboardDictionary, shouldFollowKeyboard: true)
+            self.moveLabel(keyboardInfo, shouldFollowKeyboard: true)
         }
         
-        self.blockForStateWillMove = { (keyboardDictionary: [NSObject : AnyObject]) -> Void in
+        self.blockForStateWillMove = { (keyboardInfo: [NSObject : AnyObject]) -> Void in
             self.stateLabel.text = "blockWillMove"
-            self.moveLabel(keyboardDictionary, shouldFollowKeyboard: true)
+            self.moveLabel(keyboardInfo, shouldFollowKeyboard: true)
         }
         
-        self.blockForStateDidMove = { (keyboardDictionary: [NSObject : AnyObject]) -> Void in
-//            self.stateLabel.text = "blockDidMove"
-            self.moveLabel(keyboardDictionary, shouldFollowKeyboard: true)
+        self.blockForStateDidMove = { (keyboardInfo: [NSObject : AnyObject]) -> Void in
+            self.stateLabel.text = "blockDidMove"
+            self.moveLabel(keyboardInfo, shouldFollowKeyboard: true)
         }
     }
     
     
     private func initViews() {
         
+        self.functionButton.setTitle(self.observationModeStringArray[self.mode.rawValue], forState: .Normal)
+        self.pauseButton.setTitle("pause", forState: .Normal)
     }
-
+    
+    
+    @IBAction func toggleMode(sender: UIButton) {
+        
+        if self.mode == .Block {
+            
+            let sharedObserver = CPKeyboardStateObserver.sharedObserver
+            sharedObserver.stopObserving()
+            sharedObserver.startObserving(self.view, delegate: self)
+        }
+    }
+    
     
     private func moveLabel(userInfo: [NSObject : AnyObject], shouldFollowKeyboard: Bool) {
         
+        guard let keyboardFrame = userInfo[KeyboardFrameDictionaryKey.CPKeyboardStateObserverNewFrameKey]?.CGRectValue,
+        let animationDuration = userInfo[KeyboardFrameDictionaryKey.AnimationDuration]?.doubleValue else {
+            return
+        }
+        
+        UIView.animateWithDuration(animationDuration, animations: { () -> Void in
+            
+            if shouldFollowKeyboard {
+                self.stateLabelBottomConstraint.constant = keyboardFrame.origin.y
+            }
+            else {
+                self.stateLabelBottomConstraint.constant = UIScreen.mainScreen().bounds.size.height
+            }
+            
+            }, completion: nil)
+    }
+    
+    
+    // MARK: CPKeyboardStateObserverDelegate methods
+    
+    func keyboardDidMove(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject]) {
+        self.stateLabel.text = "blockDidMove"
+        self.moveLabel(keyboardInfo, shouldFollowKeyboard: true)
+    }
+    
+    func keyboardWillDock(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject]) {
+        self.stateLabel.text = "blockDidDock"
+        self.moveLabel(keyboardInfo, shouldFollowKeyboard: true)
+    }
+    
+    func keyboardWillHide(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject]) {
+        self.stateLabel.text = "blockDidHide"
+        self.moveLabel(keyboardInfo, shouldFollowKeyboard: true)
+    }
+    
+    func keyboardWillMove(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject]) {
+        self.stateLabel.text = "blockWillMove"
+        self.moveLabel(keyboardInfo, shouldFollowKeyboard: true)
+    }
+    
+    func keyboardWillShow(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject]) {
+        self.stateLabel.text = "blockDidShow"
+        self.moveLabel(keyboardInfo, shouldFollowKeyboard: true)
+    }
+    
+    func keyboardWillUndock(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject]) {
+        self.stateLabel.text = "blockDidUndock"
+        self.moveLabel(keyboardInfo, shouldFollowKeyboard: true)
     }
 }

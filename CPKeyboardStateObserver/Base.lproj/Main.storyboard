@@ -26,18 +26,18 @@
                                 <rect key="frame" x="518" y="20" width="62" height="30"/>
                                 <state key="normal" title="Delegate"/>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Tj6-ym-blA">
-                                <rect key="frame" x="279" y="571.5" width="42" height="20.5"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="wUj-oZ-ygW">
                                 <rect key="frame" x="20" y="58" width="560" height="484"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Tj6-ym-blA">
+                                <rect key="frame" x="279" y="571.5" width="42" height="20.5"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
@@ -57,8 +57,8 @@
                         </constraints>
                         <variation key="default">
                             <mask key="constraints">
-                                <exclude reference="4s0-79-VOX"/>
                                 <exclude reference="nKS-xb-xDk"/>
+                                <exclude reference="4s0-79-VOX"/>
                                 <exclude reference="gCG-r8-iRn"/>
                             </mask>
                         </variation>
@@ -66,7 +66,8 @@
                     <connections>
                         <outlet property="functionButton" destination="Qxg-6C-gXz" id="Oc2-eJ-yCS"/>
                         <outlet property="pauseButton" destination="uiK-U2-jkD" id="qBw-Ow-6QW"/>
-                        <outlet property="stateLabel" destination="Tj6-ym-blA" id="NUV-pM-za9"/>
+                        <outlet property="stateLabel" destination="Tj6-ym-blA" id="dcR-VH-1lL"/>
+                        <outlet property="stateLabelBottomConstraint" destination="fuo-PG-DTy" id="EU0-91-1jC"/>
                         <outlet property="textView" destination="wUj-oZ-ygW" id="hvQ-dB-WJp"/>
                     </connections>
                 </viewController>
