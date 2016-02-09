@@ -52,7 +52,7 @@ struct KeyboardFrameDictionaryKey {
     static let CPKeyboardStateObserverOriginalKeyboardFrame = "HPSKeyboardStateObserverOriginalKeyboardFrameKey"
 }
 
-class CPKeyboardStateObserver {
+class CPKeyboardStateObserver: NSObject {
     
     static let sharedObserver = CPKeyboardStateObserver()
     
@@ -145,9 +145,11 @@ class CPKeyboardStateObserver {
     
     func initObserver(view: UIView) {
         
-        self.delay(self.keyboardAnimationTime) { () -> () in
+        self.initState(view)
+        
+//        self.delay(self.keyboardAnimationTime) { () -> () in
             self.addObserver()
-        }
+//        }
     }
     
     
@@ -179,11 +181,11 @@ class CPKeyboardStateObserver {
         
 //        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("keyboardWillHide"), name: UIKeyboardWillHideNotification, object: nil)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("keyboardWillChangeFrame"), name: UIKeyboardWillChangeFrameNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillChangeFrame:", name: UIKeyboardWillChangeFrameNotification, object: nil)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("keyboardDidChangeFrame"), name: UIKeyboardDidChangeFrameNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardDidChangeFrame:", name: UIKeyboardDidChangeFrameNotification, object: nil)
         
-        self.isObserving = false
+        self.isObserving = true
     }
     
     
@@ -317,10 +319,8 @@ class CPKeyboardStateObserver {
     private func createDictionary(userInfo: [NSObject : AnyObject]) -> [NSObject : AnyObject]? {
         
         let screenHeight = UIScreen.mainScreen().bounds.size.height
-        
-        guard var newFrame = userInfo[KeyboardFrameDictionaryKey.End]?.CGRectValue else {
-            return nil
-        }
+
+        var newFrame = (userInfo[KeyboardFrameDictionaryKey.End] as! NSValue).CGRectValue()
         
         let keyboardY: CGFloat = newFrame.origin.y
         

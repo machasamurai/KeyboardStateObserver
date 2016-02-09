@@ -125,23 +125,57 @@ class ViewController: UIViewController, CPKeyboardObserverDelegate {
     
     private func moveLabel(userInfo: [NSObject : AnyObject], shouldFollowKeyboard: Bool) {
         
-        guard let keyboardFrame = userInfo[KeyboardFrameDictionaryKey.CPKeyboardStateObserverNewFrameKey]?.CGRectValue,
-        let animationDuration = userInfo[KeyboardFrameDictionaryKey.AnimationDuration]?.doubleValue else {
-            return
-        }
+        let keyboardFrame = (userInfo[KeyboardFrameDictionaryKey.CPKeyboardStateObserverNewFrameKey] as! NSValue).CGRectValue()
         
-        UIView.animateWithDuration(animationDuration, animations: { () -> Void in
-            
+//        UIView.animateWithDuration(animationDuration, animations: { () -> Void in
+        NSLog("keyboard.origin.y %f", UIScreen.mainScreen().bounds.size.height - keyboardFrame.origin.y)
             if shouldFollowKeyboard {
-                self.stateLabelBottomConstraint.constant = keyboardFrame.origin.y
+                self.stateLabelBottomConstraint.constant = UIScreen.mainScreen().bounds.size.height - keyboardFrame.origin.y
             }
             else {
                 self.stateLabelBottomConstraint.constant = UIScreen.mainScreen().bounds.size.height
             }
-            
-            }, completion: nil)
+        
+        self.stateLabel.setNeedsDisplay()
+        self.stateLabel.layoutIfNeeded()
+//            }, completion: nil)
     }
     
+    @IBAction func toggleAction(sender: UIButton) {
+        
+        let keyboardObserver = CPKeyboardStateObserver.sharedObserver
+        
+        if keyboardObserver.isObserving {
+            keyboardObserver.pauseObserver()
+            sender.setTitle("play", forState: .Normal)
+            self.stateLabel.text = "pause"
+        }
+        else {
+            keyboardObserver.restartObserver()
+            sender.setTitle("pause", forState: .Normal)
+            self.stateLabel.text = "play"
+        }
+    }
+    
+    /*
+    - (IBAction)toggleAction:(id)sender
+    {
+    UIButton *button = (UIButton *)sender;
+    
+    HPSKeyboardStateObserver *keyboardStateObserver = [HPSKeyboardStateObserver sharedObserver];
+    
+    if(keyboardStateObserver.isObserving){
+    [keyboardStateObserver pauseObserver];
+    [button setTitle:@"play" forState:UIControlStateNormal];
+    self.stateLabel.text = @"pause";
+    }
+    else{
+    [keyboardStateObserver restartObserver];
+    [button setTitle:@"pause" forState:UIControlStateNormal];
+    self.stateLabel.text = @"play";
+    }
+    }
+    */
     
     // MARK: CPKeyboardStateObserverDelegate methods
     
