@@ -35,10 +35,10 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Tj6-ym-blA">
-                                <rect key="frame" x="279" y="572" width="42" height="20"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Tj6-ym-blA">
+                                <rect key="frame" x="279" y="571" width="42" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
@@ -53,7 +53,7 @@
                             <constraint firstItem="uiK-U2-jkD" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="Mpd-Wx-1VD"/>
                             <constraint firstItem="Tj6-ym-blA" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="VeT-gc-jVM"/>
                             <constraint firstItem="wUj-oZ-ygW" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="afw-nd-tbf"/>
-                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="Tj6-ym-blA" secondAttribute="bottom" constant="8" id="fuo-PG-DTy"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="Tj6-ym-blA" secondAttribute="bottom" constant="8" symbolic="YES" id="fuo-PG-DTy"/>
                             <constraint firstItem="Qxg-6C-gXz" firstAttribute="leading" secondItem="uiK-U2-jkD" secondAttribute="trailing" constant="211" id="gCG-r8-iRn"/>
                             <constraint firstItem="uiK-U2-jkD" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="nKS-xb-xDk"/>
                             <constraint firstAttribute="trailingMargin" secondItem="Qxg-6C-gXz" secondAttribute="trailing" id="udW-gI-8Qz"/>

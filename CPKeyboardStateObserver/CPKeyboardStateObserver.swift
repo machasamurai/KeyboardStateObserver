@@ -104,6 +104,10 @@ class CPKeyboardStateObserver: NSObject {
         static func isDataValid() -> Bool {
             return (isKeyboardAtBottom != nil && isKeyboardDetached != nil && isKeyboardHidden != nil && isKeyboardVisible != nil)
         }
+        
+        static func printState() {
+            print("bottom: \(isKeyboardAtBottom!)\ndetached: \(isKeyboardDetached!)\nhidden: \(isKeyboardHidden!)\nvisible: \(isKeyboardVisible!)")
+        }
     }
     
     
@@ -247,6 +251,7 @@ class CPKeyboardStateObserver: NSObject {
     func calculateNextState(userInfo: [NSObject : AnyObject], caller: KeyboardObserverCaller) {
         
         KeyboardStateDefinition.calculateKeyboardPosition(userInfo)
+        KeyboardStateDefinition.printState()
         
         if KeyboardStateDefinition.isDataValid() {
             

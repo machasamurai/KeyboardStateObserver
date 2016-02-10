@@ -74,31 +74,37 @@ class ViewController: UIViewController, CPKeyboardObserverDelegate {
     private func initData() {
         
         self.blockForStateHide = { (keyboardInfo: [NSObject : AnyObject]) -> Void in
+            print("didHide")
             self.stateLabel.text = "blockDidHide"
             self.moveLabel(keyboardInfo, shouldFollowKeyboard: true)
         }
         
         self.blockForStateShow = { (keyboardInfo: [NSObject : AnyObject]) -> Void in
+            print("didShow")
             self.stateLabel.text = "blockDidShow"
             self.moveLabel(keyboardInfo, shouldFollowKeyboard: true)
         }
         
         self.blockForStateUndockEvent = { (keyboardInfo: [NSObject : AnyObject]) -> Void in
+            print("didUndock")
             self.stateLabel.text = "blockDidUndock"
             self.moveLabel(keyboardInfo, shouldFollowKeyboard: true)
         }
         
         self.blockForStateDockEvent = { (keyboardInfo: [NSObject : AnyObject]) -> Void in
+            print("didDock")
             self.stateLabel.text = "blockDidDock"
             self.moveLabel(keyboardInfo, shouldFollowKeyboard: true)
         }
         
         self.blockForStateWillMove = { (keyboardInfo: [NSObject : AnyObject]) -> Void in
+            print("didWillMove")
             self.stateLabel.text = "blockWillMove"
             self.moveLabel(keyboardInfo, shouldFollowKeyboard: true)
         }
         
         self.blockForStateDidMove = { (keyboardInfo: [NSObject : AnyObject]) -> Void in
+            print("didMove")
             self.stateLabel.text = "blockDidMove"
             self.moveLabel(keyboardInfo, shouldFollowKeyboard: true)
         }
@@ -128,16 +134,20 @@ class ViewController: UIViewController, CPKeyboardObserverDelegate {
         let keyboardFrame = (userInfo[KeyboardFrameDictionaryKey.CPKeyboardStateObserverNewFrameKey] as! NSValue).CGRectValue()
         
 //        UIView.animateWithDuration(animationDuration, animations: { () -> Void in
-        NSLog("keyboard.origin.y %f", UIScreen.mainScreen().bounds.size.height - keyboardFrame.origin.y)
-            if shouldFollowKeyboard {
-                self.stateLabelBottomConstraint.constant = UIScreen.mainScreen().bounds.size.height - keyboardFrame.origin.y
-            }
-            else {
-                self.stateLabelBottomConstraint.constant = UIScreen.mainScreen().bounds.size.height
-            }
+        NSLog("keyboard.origin.y %@", NSStringFromCGRect(keyboardFrame))
         
-        self.stateLabel.setNeedsDisplay()
-        self.stateLabel.layoutIfNeeded()
+        if shouldFollowKeyboard {
+            self.stateLabelBottomConstraint.constant = (UIScreen.mainScreen().bounds.size.height - keyboardFrame.origin.y) + self.stateLabel.frame.size.height
+        }
+        else {
+            self.stateLabelBottomConstraint.constant = UIScreen.mainScreen().bounds.size.height
+        }
+        
+        UIView.animateWithDuration(0.3, animations: { () -> Void in
+//            self.stateLabel.setNeedsDisplay()
+            self.view.layoutIfNeeded()
+        }, completion: nil)
+        
 //            }, completion: nil)
     }
     
