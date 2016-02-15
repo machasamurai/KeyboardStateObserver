@@ -9,13 +9,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "CPKeyboardStateObserver/CPKeyboardStateObserver.swift"
-            timestampString = "476766238.673097"
+            filePath = "CPKeyboardStateObserver/ViewController.swift"
+            timestampString = "477199298.749184"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "265"
-            endingLineNumber = "265"
-            landmarkName = "calculateNextState(_:caller:)"
+            startingLineNumber = "139"
+            endingLineNumber = "139"
+            landmarkName = "moveLabel(_:shouldFollowKeyboard:)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -26,11 +26,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "CPKeyboardStateObserver/CPKeyboardStateObserver.swift"
-            timestampString = "476766459.186596"
+            timestampString = "477199563.844186"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "358"
-            endingLineNumber = "358"
+            startingLineNumber = "364"
+            endingLineNumber = "364"
             landmarkName = "executeCodeForCurrentState(_:caller:)"
             landmarkType = "5">
          </BreakpointContent>
