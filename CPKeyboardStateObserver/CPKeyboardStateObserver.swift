@@ -53,29 +53,35 @@ struct KeyboardFrameDictionaryKey {
 }
 
 class CPKeyboardStateObserver: NSObject {
-    
+    // singleton instance
     static let sharedObserver = CPKeyboardStateObserver()
     
-    var delegate: CPKeyboardObserverDelegate!
+    // callback delegate
+    private var delegate: CPKeyboardObserverDelegate!
     
-    var blockForStateHide: BlockForState!
+    // callback blocks
+    private var blockForStateHide: BlockForState!
     var blockForStateShow: BlockForState!
     var blockForStateUndock: BlockForState!
     var blockForStateDock: BlockForState!
     var blockForStateWillMove: BlockForState!
     var blockForStateDidMove: BlockForState!
     
+    // current state the keyboard is in
     var currentKeyboardState: KeyboardObserverState!
+    // the previous state the keyboard was in
     var previousKeyboardState: KeyboardObserverState!
     
-    var hasKeyboardJustUndocked: Bool = false
-    var hasKeyboardJustDocked: Bool = false
+    // helper variables to determine the next state
+    private var hasKeyboardJustUndocked: Bool = false
+    private var hasKeyboardJustDocked: Bool = false
     
-    var isObserving: Bool = false
+    // true when is observing, false when is stopped or paused
+    private var isObserving: Bool = false
     
     let keyboardAnimationTime = 0.5
     
-    
+    // definitions struct to calculate the next keyboard state
     struct KeyboardStateDefinition {
         
         static var isKeyboardAtBottom: Bool?
@@ -110,7 +116,7 @@ class CPKeyboardStateObserver: NSObject {
         }
     }
     
-    
+    // the keyboard states
     enum KeyboardObserverState: Int {
         case Hidden
         case ShownDocked
@@ -120,13 +126,13 @@ class CPKeyboardStateObserver: NSObject {
         case HiddenSplit
     }
     
-    
+    // Callers definitions for the keyboard state changed NSNotifications
     enum KeyboardObserverCaller: Int {
         case KeyboardObserverCallerWillChange
         case KeyboardObserverCallerDidChange
     }
     
-    
+    // start observing using blocks
     func startObserving(view: UIView, blockForStateHide: BlockForState, blockForStateShow: BlockForState, blockForStateUndock: BlockForState, blockForStateDock: BlockForState, blockForStateWillMove: BlockForState, blockForStateDidMove: BlockForState) {
         
         self.blockForStateHide = blockForStateHide
@@ -139,30 +145,31 @@ class CPKeyboardStateObserver: NSObject {
         self.initObserver(view)
     }
     
-    
+    // start observing using the CPKeyboardObserverDelegate
     func startObserving(view: UIView, delegate: CPKeyboardObserverDelegate) {
-        
         self.delegate = delegate
         self.initObserver(view)
     }
     
-    
+    // initialize the observer
+    // init the keyboard state
+    // add the keyboard notification observer
     func initObserver(view: UIView) {
-        
         self.initState(view)
-        
-//        self.delay(self.keyboardAnimationTime) { () -> () in
-            self.addObserver()
-//        }
+        self.addObserver()
     }
     
-    
+    // init the keyboard state
     private func initState(view: UIView) {
         
+        // hide the keyboard
         view.endEditing(true)
         
+        // set the current keyboard state to 'hidden'
         self.currentKeyboardState = .Hidden
+        // set the previous keyboard state to 'hidden'
         self.previousKeyboardState = .Hidden
+        // initialize the helper variables
         self.hasKeyboardJustUndocked = false
         self.hasKeyboardJustDocked = false
     }
@@ -174,16 +181,13 @@ class CPKeyboardStateObserver: NSObject {
         self.blockForStateHide = nil
         self.blockForStateShow = nil
         self.blockForStateWillMove = nil
+        self.blockForStateUndock = nil
     }
     
     
     private func addObserver() {
         
-//        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("keyboardWillShow"), name: UIKeyboardWillShowNotification, object: nil)
-        
-//        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("keyboardDidHide"), name: UIKeyboardDidHideNotification, object: nil)
-        
-//        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("keyboardWillHide"), name: UIKeyboardWillHideNotification, object: nil)
+        NSNotificationCenter.defaultCenter().removeObserver(self)
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillChangeFrame:", name: UIKeyboardWillChangeFrameNotification, object: nil)
         
@@ -208,9 +212,6 @@ class CPKeyboardStateObserver: NSObject {
     
     
     func pauseObserver() {
-        
-        NSNotificationCenter.defaultCenter().removeObserver(self)
-        
         self.isObserving = false
     }
     
@@ -256,62 +257,53 @@ class CPKeyboardStateObserver: NSObject {
         if KeyboardStateDefinition.isDataValid() {
             
             self.previousKeyboardState = self.currentKeyboardState
-            print("previous state \(self.previousKeyboardState)")
-            print("current state \(self.currentKeyboardState)")
+            
             guard let currentKeyboardState = self.currentKeyboardState else {
-                print("currentKeyboardState is nil")
                 return
             }
             
             switch currentKeyboardState {
-            
-            // keyboard is hidden
+                
+                // keyboard is hidden
             case .Hidden:
                 
                 if KeyboardStateDefinition.isKeyboardAtBottom! {
-                    print("isAtBottom")
                     self.currentKeyboardState = .ShownDocked
                 }
                 else if KeyboardStateDefinition.isKeyboardDetached! {
-                    print("isDetached")
                     self.currentKeyboardState = .ShownUndocked
                 }
                 
                 break
-            
-            // keyboard is being displayed
+                
+                // keyboard is being displayed
             case .ShownDocked:
                 
                 if KeyboardStateDefinition.isKeyboardDetached! {
-                    print("isDetached")
                     self.currentKeyboardState = .ShownUndocked
                 }
                 else if KeyboardStateDefinition.isKeyboardHidden! {
-                    print("isHidden")
                     self.currentKeyboardState = .Hidden
                 }
                 
                 break
-            
-            // keyboard is being displayed (split)
+                
+                // keyboard is being displayed (split)
             case .ShownUndocked:
                 
                 if KeyboardStateDefinition.isKeyboardHidden! {
-                    print("isHidden")
                     self.currentKeyboardState = .HiddenUndocked
                 }
                 else if KeyboardStateDefinition.isKeyboardAtBottom! && KeyboardStateDefinition.isKeyboardVisible! {
-                    print("isAtBottom && isVisible")
                     self.currentKeyboardState = .ShownDocked
                 }
                 
                 break
-            
-            // keyboard gets hidden after being displayed (split)
+                
+                // keyboard gets hidden after being displayed (split)
             case .HiddenUndocked:
                 
                 if KeyboardStateDefinition.isKeyboardDetached! {
-                    print("isDetached")
                     self.currentKeyboardState = .ShownUndocked
                 }
                 
@@ -332,7 +324,7 @@ class CPKeyboardStateObserver: NSObject {
     private func createDictionary(userInfo: [NSObject : AnyObject]) -> [NSObject : AnyObject]? {
         
         let screenHeight = UIScreen.mainScreen().bounds.size.height
-
+        
         var newFrame = (userInfo[KeyboardFrameDictionaryKey.End] as! NSValue).CGRectValue()
         
         let keyboardY: CGFloat = newFrame.origin.y
@@ -359,14 +351,18 @@ class CPKeyboardStateObserver: NSObject {
     
     
     private func executeCodeForCurrentState(userInfo: [NSObject : AnyObject], caller: KeyboardObserverCaller) {
-        print("--------------\nexecuteForCurrentState")
+        
+        // if is not observing don't do anything
+        if !self.isObserving {
+            return
+        }
+        
         // execute the corresponding code for the current and previous state
         switch self.currentKeyboardState! {
             
         case .Hidden: fallthrough
         case .HiddenUndocked: fallthrough
         case .HiddenSplit:
-            print("Hidden/HiddenUndocked/HiddenSplit")
             // hide event
             if self.delegate != nil {
                 self.delegate.keyboardWillHide(self, keyboardInfo: userInfo)
@@ -374,34 +370,33 @@ class CPKeyboardStateObserver: NSObject {
             else {
                 self.blockForStateHide(keyboardInfo: userInfo)
             }
-        
+            
             self.hasKeyboardJustDocked = false
             
             break
             
         case .ShownDocked:
-            print("ShownDocked")
             // keyboard returns to the bottom of the screen
             if self.previousKeyboardState == KeyboardObserverState.ShownUndocked ||
                 self.previousKeyboardState == KeyboardObserverState.ShownSplit {
-                    print("state: shownUndocked || shownSplit")
-                if self.delegate != nil {
-                    self.delegate.keyboardWillDock(self, keyboardInfo: userInfo)
-                }
-                else {
-                    self.blockForStateDock(keyboardInfo: userInfo)
-                }
-            
-                self.hasKeyboardJustUndocked = false
-                self.hasKeyboardJustDocked = true
-            
-                break
+                    
+                    if self.delegate != nil {
+                        self.delegate.keyboardWillDock(self, keyboardInfo: userInfo)
+                    }
+                    else {
+                        self.blockForStateDock(keyboardInfo: userInfo)
+                    }
+                    
+                    self.hasKeyboardJustUndocked = false
+                    self.hasKeyboardJustDocked = true
+                    
+                    break
             }
             else {
                 if self.hasKeyboardJustDocked {
                     return
                 }
-            
+                
                 if self.delegate != nil {
                     self.delegate.keyboardWillShow(self, keyboardInfo: userInfo)
                 }
@@ -409,15 +404,15 @@ class CPKeyboardStateObserver: NSObject {
                     self.blockForStateShow(keyboardInfo: userInfo)
                 }
             }
-        
+            
             break
-        
+            
         case .ShownUndocked: fallthrough
         case .ShownSplit:
-            print("shownUnsocked || shownSplit")
+            
             // detach event
             if self.previousKeyboardState == KeyboardObserverState.ShownDocked {
-                print("previous state: shownDocked")
+                
                 if self.delegate != nil {
                     self.delegate.keyboardWillUndock(self, keyboardInfo: userInfo)
                 }
@@ -428,7 +423,45 @@ class CPKeyboardStateObserver: NSObject {
                 self.hasKeyboardJustDocked = false
                 self.hasKeyboardJustUndocked = true
             }
-            // the keyboard moved while being detached
+                // the keyboard moved while being detached
+            else if self.previousKeyboardState == KeyboardObserverState.ShownUndocked {
+                
+                if caller == KeyboardObserverCaller.KeyboardObserverCallerWillChange {
+                    if self.delegate != nil {
+                        self.delegate.keyboardWillMove(self, keyboardInfo: userInfo)
+                    }
+                    else {
+                        self.blockForStateWillMove(keyboardInfo: userInfo)
+                    }
+                    
+                    //                    self.hasKeyboardJustUndocked = false
+                }
+                else {
+                    if self.hasKeyboardJustUndocked {
+                        
+                        self.delay(0.5, closure: { () -> () in
+                            self.hasKeyboardJustUndocked = false
+                        })
+                        
+                        if self.delegate != nil {
+                            self.delegate.keyboardWillUndock(self, keyboardInfo: userInfo)
+                        }
+                        else {
+                            self.blockForStateUndock(keyboardInfo: userInfo)
+                        }
+                        
+                        return
+                    }
+                    
+                    if self.delegate != nil {
+                        self.delegate.keyboardDidMove(self, keyboardInfo: userInfo)
+                    }
+                    else {
+                        self.blockForStateDidMove(keyboardInfo: userInfo)
+                    }
+                }
+                
+            }
             else {
                 if caller == KeyboardObserverCaller.KeyboardObserverCallerWillChange {
                     if self.delegate != nil {
@@ -437,23 +470,25 @@ class CPKeyboardStateObserver: NSObject {
                     else {
                         self.blockForStateWillMove(keyboardInfo: userInfo)
                     }
-                    hier springt
-                    self.hasKeyboardJustUndocked = false
                 }
                 else {
                     if self.hasKeyboardJustUndocked {
+                        if self.delegate != nil {
+                            self.delegate.keyboardWillUndock(self, keyboardInfo: userInfo)
+                        }
+                        else {
+                            self.blockForStateUndock(keyboardInfo: userInfo)
+                        }
+                        
                         return
                     }
-                
-                    self.hasKeyboardJustUndocked = false
-                    return
-                }
-                
-                if self.delegate != nil {
-                    self.delegate.keyboardDidMove(self, keyboardInfo: userInfo)
-                }
-                else {
-                    self.blockForStateDidMove(keyboardInfo: userInfo)
+                    
+                    if self.delegate != nil {
+                        self.delegate.keyboardDidMove(self, keyboardInfo: userInfo)
+                    }
+                    else {
+                        self.blockForStateDidMove(keyboardInfo: userInfo)
+                    }
                 }
             }
         }

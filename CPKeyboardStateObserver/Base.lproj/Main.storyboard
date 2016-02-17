@@ -28,6 +28,9 @@
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Qxg-6C-gXz">
                                 <rect key="frame" x="518" y="20" width="62" height="30"/>
                                 <state key="normal" title="Delegate"/>
+                                <connections>
+                                    <action selector="toggleMode:" destination="BYZ-38-t0r" eventType="touchUpInside" id="a3G-nu-GP8"/>
+                                </connections>
                             </button>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="wUj-oZ-ygW">
                                 <rect key="frame" x="20" y="58" width="560" height="484"/>
