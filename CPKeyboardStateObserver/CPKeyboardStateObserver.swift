@@ -116,7 +116,16 @@ class CPKeyboardStateObserver: NSObject {
         }
     }
     
-    // the keyboard states
+    /**
+     The supported keyboard states.
+    
+     - Hidden: the keyboard is not visible.
+     - ShownDocked: the keyboard is visible and docked at the bottom of the screen.
+     - ShownUndocked: the keyboard is visible and detached from the screen bottom.
+     - HiddenUndocked: the keyboard is not visible and detached from the screen bottom.
+     - ShownSplit: the keyboard is visible and split while being detached from the screen bottom.
+     - HiddenSplit: the keyboard is not visible and split while being detached from the screen bottom (when visible)
+     */
     enum KeyboardObserverState: Int {
         case Hidden
         case ShownDocked
@@ -126,13 +135,29 @@ class CPKeyboardStateObserver: NSObject {
         case HiddenSplit
     }
     
-    // Callers definitions for the keyboard state changed NSNotifications
+    /**
+     Caller definitions for the NSNotification events when the keyboard state changes.
+     
+     - KeyboardObserverCallerWillChange: the keyboard frame will change event caller.
+     - KeyboardObserverCallerDidChange: the keyboard frame did change event caller.
+     */
     enum KeyboardObserverCaller: Int {
         case KeyboardObserverCallerWillChange
         case KeyboardObserverCallerDidChange
     }
     
-    // start observing using blocks
+    /**
+     Start observing using blocks.
+     
+     - Parameters: 
+        - view: the view of the UIViewController that starts the observer. Used to hide the keyboard.
+        - blockForStateHide: code block that gets executed when the keyboard hides.
+        - blockForStateShow: code block that gets executed when the keyboard shows up.
+        - blockForStateUndock: code block that gets executed when the keyboard detaches from the screen bottom.
+        - blockForStateDock: code block that gets executed when the keyboard returns to the screen bottom.
+        - blockForStateWillMove: code block that gets executed when the keyboard keyboard starts to move/split/merge while being detached.
+        - blockForStateDidMove: code block that gets executed when the keyboard keyboard did move/split/merge while being detached.
+     */
     func startObserving(view: UIView, blockForStateHide: BlockForState, blockForStateShow: BlockForState, blockForStateUndock: BlockForState, blockForStateDock: BlockForState, blockForStateWillMove: BlockForState, blockForStateDidMove: BlockForState) {
         
         self.blockForStateHide = blockForStateHide
@@ -145,15 +170,23 @@ class CPKeyboardStateObserver: NSObject {
         self.initObserver(view)
     }
     
-    // start observing using the CPKeyboardObserverDelegate
+    /**
+     Start observing using the CPKeyboardObserverDelegate as callback.
+     
+     - Parameter view: the view.
+     - Parameter delegate: the delegate
+    */
     func startObserving(view: UIView, delegate: CPKeyboardObserverDelegate) {
         self.delegate = delegate
         self.initObserver(view)
     }
     
-    // initialize the observer
-    // init the keyboard state
-    // add the keyboard notification observer
+    /**
+     Initializes the observer.
+     Inits the keyboard state and adds the NSNotificationsObserver for the 'UIKeyboardWillChangeFrameNotification' and 'UIKeyboardDidChangeFrameNotification' events.
+     Init the keyboard state
+     Add the keyboard notification observer
+     */
     func initObserver(view: UIView) {
         self.initState(view)
         self.addObserver()
