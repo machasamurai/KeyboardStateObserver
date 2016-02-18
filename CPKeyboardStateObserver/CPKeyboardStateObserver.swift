@@ -184,15 +184,22 @@ class CPKeyboardStateObserver: NSObject {
     /**
      Initializes the observer.
      Inits the keyboard state and adds the NSNotificationsObserver for the 'UIKeyboardWillChangeFrameNotification' and 'UIKeyboardDidChangeFrameNotification' events.
-     Init the keyboard state
-     Add the keyboard notification observer
+     Init the keyboard state.
+     Add the keyboard notification observer.
+     
+     - Parameter view: view used to hide the keyboard.
      */
     func initObserver(view: UIView) {
         self.initState(view)
         self.addObserver()
     }
     
-    // init the keyboard state
+    /**
+     Initializes the keyboard state.
+     Hides the keyboard using the view instance.
+     
+     - Parameter view: view used to hide the keyboard.
+     */
     private func initState(view: UIView) {
         
         // hide the keyboard
@@ -202,12 +209,15 @@ class CPKeyboardStateObserver: NSObject {
         self.currentKeyboardState = .Hidden
         // set the previous keyboard state to 'hidden'
         self.previousKeyboardState = .Hidden
+        
         // initialize the helper variables
         self.hasKeyboardJustUndocked = false
         self.hasKeyboardJustDocked = false
     }
     
-    
+    /**
+     Free the memory.
+     */
     deinit {
         self.delegate = nil
         self.blockForStateDidMove = nil
@@ -217,7 +227,9 @@ class CPKeyboardStateObserver: NSObject {
         self.blockForStateUndock = nil
     }
     
-    
+    /**
+     Remove already added observer first, then add the observer for the 'UIKeyboardWillChangeFrameNotification' and 'UIKeyboardDidChangeFrameNotification' notifications.
+     */
     private func addObserver() {
         
         NSNotificationCenter.defaultCenter().removeObserver(self)
@@ -226,10 +238,14 @@ class CPKeyboardStateObserver: NSObject {
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardDidChangeFrame:", name: UIKeyboardDidChangeFrameNotification, object: nil)
         
+        // since the notification observer has been added observing has started
         self.isObserving = true
     }
     
-    
+    /**
+     Stops observing.
+     Removes the keyboard related notification observers and frees memory.
+     */
     func stopObserving() {
         
         NSNotificationCenter.defaultCenter().removeObserver(self)
@@ -243,12 +259,17 @@ class CPKeyboardStateObserver: NSObject {
         self.isObserving = false
     }
     
-    
+    /**
+     Pauses the observer.
+     The observer still listens to the keyboard notification events to determine the right current keyboard state in case the observer restarts again.
+     */
     func pauseObserver() {
         self.isObserving = false
     }
     
-    
+    /**
+     Restarts the observer after being paused.
+     */
     func restartObserver() {
         
         assert(self.delegate != nil || (self.blockForStateHide != nil && self.blockForStateHide != nil && self.blockForStateShow != nil && self.blockForStateWillMove != nil), "KeyboardStateObserver delegate or block not set")
@@ -257,11 +278,16 @@ class CPKeyboardStateObserver: NSObject {
     }
     
     
-    /// MARK: - Keyboard Notification events methods
+    /// MARK: - Keyboard Notification events functions
     
+    /**
+     Notification function that gets called when the keyboard will change its frame.
     
+    - Parameter notification: the notification instance received from the keyboard notification.
+    */
     func keyboardWillChangeFrame(notification: NSNotification) {
         
+        // since we need the information in the dictionary we cancel if there is none
         guard let userInfo = notification.userInfo else {
             print("notification doesn't contain a userInfo dictionary")
             return
@@ -270,9 +296,14 @@ class CPKeyboardStateObserver: NSObject {
         self.calculateNextState(userInfo, caller: .KeyboardObserverCallerWillChange)
     }
     
-    
+    /**
+     Notification function that gets called when the keyboard changed its frame
+     
+     - Parameter notification: the notification instance received from the keyboard notification.
+    */
     func keyboardDidChangeFrame(notification: NSNotification) {
         
+        // since we need the information in the dictionary we cancel if there is none
         guard let userInfo = notification.userInfo else {
             print("notification doesn't contain a userInfo dictionary")
             return
@@ -281,20 +312,29 @@ class CPKeyboardStateObserver: NSObject {
         self.calculateNextState(userInfo, caller: .KeyboardObserverCallerDidChange)
     }
     
-    
+    /**
+     Calculates the next state using the information held by the dictionary.
+     
+     - Parameter userInfo: the dictionary with the information about the keyboard frame.
+     - Parameter caller: caller to determine if the keyboard will change its frame or already did change it.
+     */
     func calculateNextState(userInfo: [NSObject : AnyObject], caller: KeyboardObserverCaller) {
         
         KeyboardStateDefinition.calculateKeyboardPosition(userInfo)
         KeyboardStateDefinition.printState()
         
+        // check if the data is valid
         if KeyboardStateDefinition.isDataValid() {
             
+            // transition to the next state, the current state becomes the previous state
             self.previousKeyboardState = self.currentKeyboardState
             
+            // if the currentState is nil return
             guard let currentKeyboardState = self.currentKeyboardState else {
                 return
             }
             
+            // determine the next state by looking at the current state and the information in the dictionary.
             switch currentKeyboardState {
                 
                 // keyboard is hidden
@@ -353,7 +393,9 @@ class CPKeyboardStateObserver: NSObject {
         }
     }
     
-    
+    /**
+     
+     */
     private func createDictionary(userInfo: [NSObject : AnyObject]) -> [NSObject : AnyObject]? {
         
         let screenHeight = UIScreen.mainScreen().bounds.size.height
@@ -382,7 +424,9 @@ class CPKeyboardStateObserver: NSObject {
         return newFrameDictionary
     }
     
-    
+    /**
+     
+     */
     private func executeCodeForCurrentState(userInfo: [NSObject : AnyObject], caller: KeyboardObserverCaller) {
         
         // if is not observing don't do anything
@@ -527,6 +571,9 @@ class CPKeyboardStateObserver: NSObject {
         }
     }
     
+    /**
+     
+     */
     func delay(delay:Double, closure:()->()) {
         dispatch_after(
             dispatch_time(
