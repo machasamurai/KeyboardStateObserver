@@ -320,8 +320,11 @@ class CPKeyboardStateObserver: NSObject {
      */
     func calculateNextState(userInfo: [NSObject : AnyObject], caller: KeyboardObserverCaller) {
         
+        // calculate the keyboard state and position
         KeyboardStateDefinition.calculateKeyboardPosition(userInfo)
-        KeyboardStateDefinition.printState()
+        
+        // print the current state for debug purposes
+        // KeyboardStateDefinition.printState()
         
         // check if the data is valid
         if KeyboardStateDefinition.isDataValid() {
@@ -337,7 +340,7 @@ class CPKeyboardStateObserver: NSObject {
             // determine the next state by looking at the current state and the information in the dictionary.
             switch currentKeyboardState {
                 
-                // keyboard is hidden
+            // keyboard is hidden
             case .Hidden:
                 
                 if KeyboardStateDefinition.isKeyboardAtBottom! {
@@ -349,7 +352,7 @@ class CPKeyboardStateObserver: NSObject {
                 
                 break
                 
-                // keyboard is being displayed
+            // keyboard is being displayed
             case .ShownDocked:
                 
                 if KeyboardStateDefinition.isKeyboardDetached! {
@@ -361,7 +364,7 @@ class CPKeyboardStateObserver: NSObject {
                 
                 break
                 
-                // keyboard is being displayed (split)
+            // keyboard is being displayed (split)
             case .ShownUndocked:
                 
                 if KeyboardStateDefinition.isKeyboardHidden! {
@@ -373,7 +376,7 @@ class CPKeyboardStateObserver: NSObject {
                 
                 break
                 
-                // keyboard gets hidden after being displayed (split)
+            // keyboard gets hidden after being displayed (split)
             case .HiddenUndocked:
                 
                 if KeyboardStateDefinition.isKeyboardDetached! {
@@ -385,25 +388,35 @@ class CPKeyboardStateObserver: NSObject {
                 break
             }
             
+            // create a new dictionary to pass it back to the observing UIViewController via the corrresponding callback method
             guard let newFrameDictionary = self.createDictionary(userInfo) else {
                 return
             }
             
+            // execute the correponding code to the new state
             self.executeCodeForCurrentState(newFrameDictionary, caller: caller)
         }
     }
     
     /**
+     Creates a new dictionary that will be passed to the observing UIViewController via the corresponding callback method later.
      
+     - Parameter userInfo: the dictionary with the information about the keyboard frame.
+     
+     - Returns: a new dictionary
      */
     private func createDictionary(userInfo: [NSObject : AnyObject]) -> [NSObject : AnyObject]? {
         
         let screenHeight = UIScreen.mainScreen().bounds.size.height
         
+        // the new frame of the keyboard
         var newFrame = (userInfo[KeyboardFrameDictionaryKey.End] as! NSValue).CGRectValue()
         
+        // the keyboard y position
         let keyboardY: CGFloat = newFrame.origin.y
         
+        // the space between the keyboard y position and the bottom of the screen (aka the keyboard height)
+        // In some cases the userInfo contained a wrong keyboard height value, that's why we calculate it by ourselves
         let spaceBetweenKeyboardStartAndScreenEnd: CGFloat = (screenHeight - keyboardY)
         var fixedKeyboardHeight: CGFloat = newFrame.size.height
         
@@ -415,17 +428,23 @@ class CPKeyboardStateObserver: NSObject {
             fixedKeyboardHeight = spaceBetweenKeyboardStartAndScreenEnd
         }
         
+        // use the fixed keyboard height
         if fixedKeyboardHeight != newFrame.size.height {
             newFrame.size.height = fixedKeyboardHeight
         }
         
+        // the new fixed dictionary
         let newFrameDictionary: [NSObject : AnyObject] = [KeyboardFrameDictionaryKey.CPKeyboardStateObserverNewFrameKey : NSValue(CGRect: newFrame), KeyboardFrameDictionaryKey.CPKeyboardStateObserverOriginalKeyboardFrame : userInfo]
         
         return newFrameDictionary
     }
     
     /**
+     Executes the code for the new keyboard state and notifies the observing UIViewController via the
+     corresponding callback method.
      
+     - Parameter userInfo: the dictionary with the information about the keyboard frame.
+     - Parameter caller: caller to determine if the keyboard will change its frame or already did change it.
      */
     private func executeCodeForCurrentState(userInfo: [NSObject : AnyObject], caller: KeyboardObserverCaller) {
         
@@ -502,7 +521,7 @@ class CPKeyboardStateObserver: NSObject {
             }
                 // the keyboard moved while being detached
             else if self.previousKeyboardState == KeyboardObserverState.ShownUndocked {
-                
+                // the keyboard will move
                 if caller == KeyboardObserverCaller.KeyboardObserverCallerWillChange {
                     if self.delegate != nil {
                         self.delegate.keyboardWillMove(self, keyboardInfo: userInfo)
@@ -513,10 +532,12 @@ class CPKeyboardStateObserver: NSObject {
                     
                     //                    self.hasKeyboardJustUndocked = false
                 }
+                // the keyboard did move or undock/detach
                 else {
+                    // it's the undock/detach event
                     if self.hasKeyboardJustUndocked {
-                        
-                        self.delay(0.5, closure: { () -> () in
+                        // reset the variable after the keyboard animation has finished
+                        self.delay(keyboardAnimationTime, closure: { () -> () in
                             self.hasKeyboardJustUndocked = false
                         })
                         
@@ -530,6 +551,7 @@ class CPKeyboardStateObserver: NSObject {
                         return
                     }
                     
+                    // it's the did move event
                     if self.delegate != nil {
                         self.delegate.keyboardDidMove(self, keyboardInfo: userInfo)
                     }
@@ -540,6 +562,7 @@ class CPKeyboardStateObserver: NSObject {
                 
             }
             else {
+                // the keyboard will move
                 if caller == KeyboardObserverCaller.KeyboardObserverCallerWillChange {
                     if self.delegate != nil {
                         self.delegate.keyboardWillMove(self, keyboardInfo: userInfo)
@@ -549,6 +572,7 @@ class CPKeyboardStateObserver: NSObject {
                     }
                 }
                 else {
+                    // it's the undock/detach event
                     if self.hasKeyboardJustUndocked {
                         if self.delegate != nil {
                             self.delegate.keyboardWillUndock(self, keyboardInfo: userInfo)
@@ -560,6 +584,7 @@ class CPKeyboardStateObserver: NSObject {
                         return
                     }
                     
+                    // it's the did move event
                     if self.delegate != nil {
                         self.delegate.keyboardDidMove(self, keyboardInfo: userInfo)
                     }
