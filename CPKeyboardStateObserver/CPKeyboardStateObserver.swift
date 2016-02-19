@@ -2,8 +2,8 @@
 //  CPKeyboardStateObserver.swift
 //  CPKeyboardStateObserver
 //
-//  Created by ベックマンラモン on 2016/02/02.
-//  Copyright © 2016年 Corepilots. All rights reserved.
+//  Created by Ramon Beckmann on 2016/02/02.
+//  Copyright © 2016 Corepilots. All rights reserved.
 //
 
 import Foundation
@@ -13,37 +13,53 @@ typealias BlockForState = (keyboardInfo: [NSObject : AnyObject]) -> Void
 
 protocol CPKeyboardObserverDelegate: class {
     
-    /// 'Keyboard will hide' event.
-    /// @param  CPKeyboardStateObserver instance.
-    /// @param  Dictionary that contains the keyboard frame values.
+    /** 'Keyboard will hide' event.
+    - Parameter keyboardStateObserver: CPKeyboardStateObserver instance.
+    - Parameter keyboardInfo: Dictionary that contains the keyboard frame values.
+     */
     func keyboardWillHide(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject])
     
-    /// 'Keyboard will show' event.
-    /// @param  CPKeyboardStateObserver instance.
-    /// @param  Dictionary that contains the keyboard frame values.
+    /** 'Keyboard will show' event.
+    - Parameter keyboardStateObserver: CPKeyboardStateObserver instance.
+    - Parameter keyboardInfo: Dictionary that contains the keyboard frame values.
+    */
     func keyboardWillShow(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject])
     
-    /// 'Keyboard will undock' event. The keyboard detaches from the bottom of the screen.
-    /// @param  CPKeyboardStateObserver instance.
-    /// @param  Dictionary that contains the keyboard frame values.
+    /** 'Keyboard will undock' event. The keyboard detaches from the bottom of the screen.
+    - Parameter keyboardStateObserver: CPKeyboardStateObserver instance.
+    - Parameter keyboardInfo: Dictionary that contains the keyboard frame values.
+    */
     func keyboardWillUndock(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject])
     
-    /// 'Keyboard will dock event. The keyboard attaches to the bottom of the screen.
-    /// @param  CPKeyboardStateObserver instance.
-    /// @param  Dictionary that contains the keyboard frame values.
+    /** 'Keyboard will dock event. The keyboard attaches to the bottom of the screen.
+    - Parameter keyboardStateObserver: CPKeyboardStateObserver instance.
+    - Parameter keyboardInfo: Dictionary that contains the keyboard frame values.
+    */
     func keyboardWillDock(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject])
     
-    /// 'Keyboard will move' event. The keyboard will be moved by the user while being detached from the bottom of the screen.
-    /// @param  CPKeyboardStateObserver instance.
-    /// @param  Dictionary that contains the keyboard frame values.
+    /** 'Keyboard will move' event. The keyboard will be moved by the user while being detached from the bottom of the screen.
+    - Parameter keyboardStateObserver: CPKeyboardStateObserver instance.
+    - Parameter keyboardInfo: Dictionary that contains the keyboard frame values.
+    */
     func keyboardWillMove(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject])
     
-    /// 'Keyboard did move' event. The keyboard was moved by the user while being detached from the bottom of the screen.
-    /// @param  CPKeyboardStateObserver instance.
-    /// @param  Dictionary that contains the keyboard frame values.
+    /** 'Keyboard did move' event. The keyboard was moved by the user while being detached from the bottom of the screen.
+    - Parameter keyboardStateObserver: CPKeyboardStateObserver instance.
+    - Parameter keyboardInfo: Dictionary that contains the keyboard frame values.
+     */
     func keyboardDidMove(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject])
 }
 
+/**
+Struct that holds the dictionary keys of the keyboard notification dictionary.
+
+- Begin: UIKeyboardFrameBeginUserInfoKey.
+ - Begin: the start frame.
+ - End: the end frame.
+ - AnimationDuration: duration of the keyboard animation.
+ - CPKeyboardStateObserverNewFrameKey: custom key used for the new keyboard frame dictionary.
+ - CPKeyboardStateObserverOriginalKeyboardFrame: the original keyboard frame dictionary.
+*/
 struct KeyboardFrameDictionaryKey {
     static let Begin                                        = "UIKeyboardFrameBeginUserInfoKey"
     static let End                                          = "UIKeyboardFrameEndUserInfoKey"
@@ -81,17 +97,23 @@ class CPKeyboardStateObserver: NSObject {
     
     let keyboardAnimationTime = 0.5
     
-    // definitions struct to calculate the next keyboard state
+    /**
+     Definitions struct to calculate the next keyboard state.
+     */
     struct KeyboardStateDefinition {
         
+        // variables that help to determine the next keyboard state
         static var isKeyboardAtBottom: Bool?
         static var isKeyboardDetached: Bool?
         static var isKeyboardHidden: Bool?
         static var isKeyboardVisible: Bool?
         
-        
+        /**
+         Calculates the next state using the information held by the dictionary.
+         */
         static func calculateKeyboardPosition(userInfo: [NSObject : AnyObject]) {
             
+            // if the new keyboard frame is not available return
             guard let endFrame: CGRect = userInfo[KeyboardFrameDictionaryKey.End]?.CGRectValue else {
                 return
             }
@@ -101,16 +123,25 @@ class CPKeyboardStateObserver: NSObject {
             
             let screenHeight = UIScreen.mainScreen().bounds.size.height
             
+            // calculations to determine the next keyboard state
             isKeyboardAtBottom = keyboardY == (screenHeight - keyboardHeight)
             isKeyboardDetached = (keyboardY + keyboardHeight) < screenHeight
             isKeyboardHidden = keyboardY == screenHeight
             isKeyboardVisible = keyboardY < screenHeight
         }
         
+        /**
+         Checks if the data is valid.
+         
+         - Returns: true if the data valid oand false if the data is not valid.
+         */
         static func isDataValid() -> Bool {
             return (isKeyboardAtBottom != nil && isKeyboardDetached != nil && isKeyboardHidden != nil && isKeyboardVisible != nil)
         }
         
+        /**
+         Prints the values of the variables. For debug purposes.
+         */
         static func printState() {
             print("bottom: \(isKeyboardAtBottom!)\ndetached: \(isKeyboardDetached!)\nhidden: \(isKeyboardHidden!)\nvisible: \(isKeyboardVisible!)")
         }
@@ -597,7 +628,10 @@ class CPKeyboardStateObserver: NSObject {
     }
     
     /**
+     Helper function to delay a code block and execute it on the main thread.
      
+     - Parameter delay: seconds to delay the execution.
+     - Parameter closure: code block to be executed.
      */
     func delay(delay:Double, closure:()->()) {
         dispatch_after(
