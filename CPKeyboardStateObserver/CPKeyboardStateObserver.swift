@@ -93,7 +93,7 @@ class CPKeyboardStateObserver: NSObject {
     private var hasKeyboardJustDocked: Bool = false
     
     // true when is observing, false when is stopped or paused
-    private var isObserving: Bool = false
+    var isObserving: Bool = false
     
     let keyboardAnimationTime = 0.5
     
@@ -110,6 +110,8 @@ class CPKeyboardStateObserver: NSObject {
         
         /**
          Calculates the next state using the information held by the dictionary.
+         
+         - Parameter userInfo: the dictionary with the information about the keyboard frame.
          */
         static func calculateKeyboardPosition(userInfo: [NSObject : AnyObject]) {
             
