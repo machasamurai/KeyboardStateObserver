@@ -27,7 +27,53 @@ In order to conform to the CPKeyboardObserverDelegate protocol you have to adopt
 
 	class ViewController: UIViewController, CPKeyboardObserverDelegate
 
+To conform to the CPKeyboardObserverDelegate you have to implement the following methods:
 
+	/** 'Keyboard will hide' event.
+    - Parameter keyboardStateObserver: CPKeyboardStateObserver instance.
+    - Parameter keyboardInfo: Dictionary that contains the keyboard frame values.
+     */
+    func keyboardWillHide(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject])
+    
+    /** 'Keyboard will show' event.
+    - Parameter keyboardStateObserver: CPKeyboardStateObserver instance.
+    - Parameter keyboardInfo: Dictionary that contains the keyboard frame values.
+    */
+    func keyboardWillShow(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject])
+    
+    /** 'Keyboard will undock' event. The keyboard detaches from the bottom of the screen.
+    - Parameter keyboardStateObserver: CPKeyboardStateObserver instance.
+    - Parameter keyboardInfo: Dictionary that contains the keyboard frame values.
+    */
+    func keyboardWillUndock(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject])
+    
+    /** 'Keyboard will dock event. The keyboard attaches to the bottom of the screen.
+    - Parameter keyboardStateObserver: CPKeyboardStateObserver instance.
+    - Parameter keyboardInfo: Dictionary that contains the keyboard frame values.
+    */
+    func keyboardWillDock(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject])
+    
+    /** 'Keyboard will move' event. The keyboard will be moved by the user while being detached from the bottom of the screen.
+    - Parameter keyboardStateObserver: CPKeyboardStateObserver instance.
+    - Parameter keyboardInfo: Dictionary that contains the keyboard frame values.
+    */
+    func keyboardWillMove(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject])
+    
+    /** 'Keyboard did move' event. The keyboard was moved by the user while being detached from the bottom of the screen.
+    - Parameter keyboardStateObserver: CPKeyboardStateObserver instance.
+    - Parameter keyboardInfo: Dictionary that contains the keyboard frame values.
+     */
+    func keyboardDidMove(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject])
+
+
+To start observing and getting notified about keyboard state changes you start the observer using the singleton with the following code:
+        
+	CPKeyboardStateObserver.sharedObserver.startObserving(self.view, delegate: self)
+
+You have to pass the singleton instance two parameters
+
+- the view of the observing UIViewController (used to hide the keyboard if neccessary)
+- the class that conforms to the CPKeyboardStateDelegate Protocol
 
 
 
