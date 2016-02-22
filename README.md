@@ -18,3 +18,38 @@ It depends on the following frameworks:
 * UIKit.framework
 
 ## Usage
+
+/**
+     Start observing using blocks.
+     
+     - Parameters: 
+        - view: the view of the UIViewController that starts the observer. Used to hide the keyboard.
+        - blockForStateHide: code block that gets executed when the keyboard hides.
+        - blockForStateShow: code block that gets executed when the keyboard shows up.
+        - blockForStateUndock: code block that gets executed when the keyboard detaches from the screen bottom.
+        - blockForStateDock: code block that gets executed when the keyboard returns to the screen bottom.
+        - blockForStateWillMove: code block that gets executed when the keyboard keyboard starts to move/split/merge while being detached.
+        - blockForStateDidMove: code block that gets executed when the keyboard keyboard did move/split/merge while being detached.
+     */
+    func startObserving(view: UIView, blockForStateHide: BlockForState, blockForStateShow: BlockForState, blockForStateUndock: BlockForState, blockForStateDock: BlockForState, blockForStateWillMove: BlockForState, blockForStateDidMove: BlockForState) {
+        
+        self.blockForStateHide = blockForStateHide
+        self.blockForStateShow = blockForStateShow
+        self.blockForStateUndock = blockForStateUndock
+        self.blockForStateDock = blockForStateDock
+        self.blockForStateWillMove = blockForStateWillMove
+        self.blockForStateDidMove = blockForStateDidMove
+        
+        self.initObserver(view)
+    }
+    
+    /**
+     Start observing using the CPKeyboardObserverDelegate as callback.
+     
+     - Parameter view: the view.
+     - Parameter delegate: the delegate
+    */
+    func startObserving(view: UIView, delegate: CPKeyboardObserverDelegate) {
+        self.delegate = delegate
+        self.initObserver(view)
+    }
