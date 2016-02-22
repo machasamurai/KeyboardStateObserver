@@ -82,7 +82,12 @@ You have to pass the singleton instance two parameters
 - the class that conforms to the CPKeyboardStateDelegate Protocol
 
 
+
 #### 2. Use the CPKeyboardStateObserver with closures/blocks
+	
+The second method to get notified about keyboard state changes is to use closures or blocks.
+For each state a different block of code will get executed. In this example the current state will get printed out to the console.
+Like with the protocol method the observer reports back with a dictionary holding the new frame (CGRect) of the keyboard.
 
 	CPKeyboardStateObserver.sharedObserver.startObserving(self.view, blockForStateHide: { (keyboardInfo) -> Void in
             print("keyboard is hidden")
