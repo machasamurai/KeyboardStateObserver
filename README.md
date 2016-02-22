@@ -33,7 +33,7 @@ To conform to the CPKeyboardObserverDelegate you have to implement the following
     - Parameter keyboardStateObserver: CPKeyboardStateObserver instance.
     - Parameter keyboardInfo: Dictionary that contains the keyboard frame values.
      */
-    func keyboardWillHide(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject])
+    **func keyboardWillHide(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject])**
     
     /** 'Keyboard will show' event.
     - Parameter keyboardStateObserver: CPKeyboardStateObserver instance.
