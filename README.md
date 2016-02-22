@@ -21,7 +21,15 @@ It depends on the following frameworks:
 
 There are two ways to receive the CPKeyboardStateObserver keyboarb event callbacks.
 
-#### Use the CPKeyboardObserverDelegate
+#### Use the CPKeyboardObserverDelegate Protocol
+
+In order to conform to the CPKeyboardObserverDelegate protocol you have to adopt it in your UIViewController.
+
+	class ViewController: UIViewController, CPKeyboardObserverDelegate
+
+
+
+
 
 /**
      Start observing using blocks.
