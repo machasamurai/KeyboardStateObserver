@@ -62,6 +62,20 @@ class ViewController: UIViewController, CPKeyboardObserverDelegate {
         
         // start the observer using blocks/closures
         CPKeyboardStateObserver.sharedObserver.startObserving(self.view, blockForStateHide: self.blockForStateHide, blockForStateShow: self.blockForStateShow, blockForStateUndock: self.blockForStateUndockEvent, blockForStateDock: self.blockForStateDockEvent, blockForStateWillMove: self.blockForStateWillMove, blockForStateDidMove: self.blockForStateDidMove)
+    
+        CPKeyboardStateObserver.sharedObserver.startObserving(self.view, blockForStateHide: { (keyboardInfo) -> Void in
+            print("keyboard is hidden")
+            }, blockForStateShow: { (keyboardInfo) -> Void in
+                print("keyboard is shown")
+            }, blockForStateUndock: { (keyboardInfo) -> Void in
+                print("keyboard is detached")
+            }, blockForStateDock: { (keyboardInfo) -> Void in
+                print("keyboard is docked")
+            }, blockForStateWillMove: { (keyboardInfo) -> Void in
+                print("keyboard will move")
+            }, blockForStateDidMove: { (keyboardInfo) -> Void in
+                print("keyboard did move")
+        })
     }
     
     

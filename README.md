@@ -21,7 +21,7 @@ It depends on the following frameworks:
 
 There are two ways to receive the CPKeyboardStateObserver keyboarb event callbacks.
 
-#### Use the CPKeyboardObserverDelegate Protocol
+#### 1. Use the CPKeyboardObserverDelegate Protocol
 
 In order to conform to the CPKeyboardObserverDelegate protocol you have to adopt it in your UIViewController.
 
@@ -29,17 +29,20 @@ In order to conform to the CPKeyboardObserverDelegate protocol you have to adopt
 
 To conform to the CPKeyboardObserverDelegate you have to implement the following methods:
 
+	
 	/** 'Keyboard will hide' event.
     - Parameter keyboardStateObserver: CPKeyboardStateObserver instance.
     - Parameter keyboardInfo: Dictionary that contains the keyboard frame values.
      */
-    **func keyboardWillHide(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject])**
+    func keyboardWillHide(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject])
     
+
     /** 'Keyboard will show' event.
     - Parameter keyboardStateObserver: CPKeyboardStateObserver instance.
     - Parameter keyboardInfo: Dictionary that contains the keyboard frame values.
     */
     func keyboardWillShow(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject])
+    
     
     /** 'Keyboard will undock' event. The keyboard detaches from the bottom of the screen.
     - Parameter keyboardStateObserver: CPKeyboardStateObserver instance.
@@ -47,17 +50,20 @@ To conform to the CPKeyboardObserverDelegate you have to implement the following
     */
     func keyboardWillUndock(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject])
     
+    
     /** 'Keyboard will dock event. The keyboard attaches to the bottom of the screen.
     - Parameter keyboardStateObserver: CPKeyboardStateObserver instance.
     - Parameter keyboardInfo: Dictionary that contains the keyboard frame values.
     */
     func keyboardWillDock(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject])
     
+    
     /** 'Keyboard will move' event. The keyboard will be moved by the user while being detached from the bottom of the screen.
     - Parameter keyboardStateObserver: CPKeyboardStateObserver instance.
     - Parameter keyboardInfo: Dictionary that contains the keyboard frame values.
     */
     func keyboardWillMove(keyboardStateObserver: CPKeyboardStateObserver, keyboardInfo: [NSObject : AnyObject])
+    
     
     /** 'Keyboard did move' event. The keyboard was moved by the user while being detached from the bottom of the screen.
     - Parameter keyboardStateObserver: CPKeyboardStateObserver instance.
@@ -76,38 +82,18 @@ You have to pass the singleton instance two parameters
 - the class that conforms to the CPKeyboardStateDelegate Protocol
 
 
+#### 2. Use the CPKeyboardStateObserver with closures/blocks
 
-/**
-     Start observing using blocks.
-     
-     - Parameters: 
-        - view: the view of the UIViewController that starts the observer. Used to hide the keyboard.
-        - blockForStateHide: code block that gets executed when the keyboard hides.
-        - blockForStateShow: code block that gets executed when the keyboard shows up.
-        - blockForStateUndock: code block that gets executed when the keyboard detaches from the screen bottom.
-        - blockForStateDock: code block that gets executed when the keyboard returns to the screen bottom.
-        - blockForStateWillMove: code block that gets executed when the keyboard keyboard starts to move/split/merge while being detached.
-        - blockForStateDidMove: code block that gets executed when the keyboard keyboard did move/split/merge while being detached.
-     */
-    func startObserving(view: UIView, blockForStateHide: BlockForState, blockForStateShow: BlockForState, blockForStateUndock: BlockForState, blockForStateDock: BlockForState, blockForStateWillMove: BlockForState, blockForStateDidMove: BlockForState) {
-        
-        self.blockForStateHide = blockForStateHide
-        self.blockForStateShow = blockForStateShow
-        self.blockForStateUndock = blockForStateUndock
-        self.blockForStateDock = blockForStateDock
-        self.blockForStateWillMove = blockForStateWillMove
-        self.blockForStateDidMove = blockForStateDidMove
-        
-        self.initObserver(view)
-    }
-    
-    /**
-     Start observing using the CPKeyboardObserverDelegate as callback.
-     
-     - Parameter view: the view.
-     - Parameter delegate: the delegate
-    */
-    func startObserving(view: UIView, delegate: CPKeyboardObserverDelegate) {
-        self.delegate = delegate
-        self.initObserver(view)
-    }
+	CPKeyboardStateObserver.sharedObserver.startObserving(self.view, blockForStateHide: { (keyboardInfo) -> Void in
+            print("keyboard is hidden")
+            }, blockForStateShow: { (keyboardInfo) -> Void in
+                print("keyboard is shown")
+            }, blockForStateUndock: { (keyboardInfo) -> Void in
+                print("keyboard is detached")
+            }, blockForStateDock: { (keyboardInfo) -> Void in
+                print("keyboard is docked")
+            }, blockForStateWillMove: { (keyboardInfo) -> Void in
+                print("keyboard will move")
+            }, blockForStateDidMove: { (keyboardInfo) -> Void in
+                print("keyboard did move")
+        })
