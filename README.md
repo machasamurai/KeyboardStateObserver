@@ -6,7 +6,14 @@ CPKeyboardStateObserver is an observer which, once registered, listens to keyboa
 You can use the CPKeyboardObserverDelagate as callback method or alternatively use closures/blocks.
 
 ## How to get started
+Just add the CPKeyboardStateObserver.swift to your project and start observing.
+For more details take a look at the 'usage' section.
 
 ## Requirements
+CPKeyboardStateObserver needs iOS 8 and higher.
+It depends on the following frameworks:
+
+* Foundation.framework
+* UIKit.framework
 
 ## Usage
