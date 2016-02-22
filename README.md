@@ -21,7 +21,7 @@ It depends on the following frameworks:
 
 There are two ways to receive the CPKeyboardStateObserver keyboarb event callbacks.
 
-### Use the CPKeyboardObserverDelegate
+#### Use the CPKeyboardObserverDelegate
 
 /**
      Start observing using blocks.
