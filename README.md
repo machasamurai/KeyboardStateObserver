@@ -1,5 +1,5 @@
-# KeyboardStateObserver
-Observer for keyboard state changes on iPad and iPhone.
+# CPKeyboardStateObserver
+Thank you for using CPKeyboardStateObserver, an observer for keyboard state changes on iPad and iPhone.
 
 ## Introduction
 
