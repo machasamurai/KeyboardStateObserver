@@ -11,6 +11,7 @@ For more details take a look at the 'usage' section.
 
 ## Requirements
 CPKeyboardStateObserver needs iOS 8 and higher.
+
 It depends on the following frameworks:
 
 * Foundation.framework
