@@ -21,7 +21,9 @@ It depends on the following frameworks:
 
 There are two ways to receive the CPKeyboardStateObserver keyboarb event callbacks.
 
-#### 1. Use the CPKeyboardObserverDelegate Protocol
+#### Start the Observer
+
+###### 1. Use the CPKeyboardObserverDelegate Protocol
 
 In order to conform to the CPKeyboardObserverDelegate protocol you have to adopt it in your UIViewController.
 
@@ -80,6 +82,7 @@ You have to pass the singleton instance two parameters
 
 - the view of the observing UIViewController (used to hide the keyboard if neccessary)
 - the class that conforms to the CPKeyboardStateDelegate Protocol
+
 
 
 
