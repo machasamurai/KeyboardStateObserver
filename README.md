@@ -135,4 +135,4 @@ You can restart the observer easily by calling the 'restartObserver' function on
     }
 
 ## License
-CPKeyboardStateObserver is licensed under the MIT licence. See the [LICENSE] for more details.
+CPKeyboardStateObserver is licensed under the MIT licence. See the [LICENSE](https://github.com/machasamurai/KeyboardStateObserver/blob/master/LICENSE) for more details.
