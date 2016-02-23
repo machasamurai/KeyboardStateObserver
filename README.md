@@ -133,3 +133,6 @@ You can restart the observer easily by calling the 'restartObserver' function on
     if !keyboardObserver.isObserving {
         keyboardObserver.restartObserver()
     }
+
+## License
+CPKeyboardStateObserver is licensed under the MIT licence. See the [LICENSE] for more details.
