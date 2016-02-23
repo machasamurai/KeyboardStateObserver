@@ -3,7 +3,7 @@ Thank you for using CPKeyboardStateObserver, an observer for keyboard state chan
 
 ## Introduction
 CPKeyboardStateObserver is an observer which, once registered, listens to keyboard state events and reports back the corresponding event and additionally provides you with the new keyboard frame information.
-You can use the CPKeyboardObserverDelagate as callback method or alternatively use closures/blocks.
+You can use the CPKeyboardObserverDelegate as callback method or alternatively use closures/blocks.
 
 ## How to get started
 Just add the CPKeyboardStateObserver.swift to your project and start observing.
@@ -19,7 +19,7 @@ It depends on the following frameworks:
 
 ## Usage
 
-There are two ways to receive the CPKeyboardStateObserver keyboarb event callbacks.
+There are two ways to receive the CPKeyboardStateObserver keyboard event callbacks.
 
 #### Start the Observer
 
@@ -29,7 +29,7 @@ In order to conform to the CPKeyboardObserverDelegate protocol you have to adopt
 
 	class ViewController: UIViewController, CPKeyboardObserverDelegate
 
-To conform to the CPKeyboardObserverDelegate you have to implement the following methods:
+To conform to the CPKeyboardObserverDelegate you have to implement the following functions:
 
 	
 	/** 'Keyboard will hide' event.
