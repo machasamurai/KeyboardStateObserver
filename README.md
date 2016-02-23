@@ -86,7 +86,7 @@ You have to pass the singleton instance two parameters
 
 
 
-#### 2. Use the CPKeyboardStateObserver with closures/blocks
+###### 2. Use the CPKeyboardStateObserver with closures/blocks
 	
 The second method to get notified about keyboard state changes is to use closures or blocks.
 For each state a different block of code will get executed. In this example the current state will get printed out to the console.
@@ -105,3 +105,32 @@ Like with the protocol method the observer reports back with a dictionary holdin
             }, blockForStateDidMove: { (keyboardInfo) -> Void in
                 print("keyboard did move")
         })
+
+
+#### Stop the observer
+
+You can stop the observer easily by calling the 'stopObserver' function on the CPKeyboardStateObserver singleton instance.
+
+	CPKeyboardStateObserver.sharedObserver.stopObserving()
+
+#### Pause the observer
+
+You can pause the observer easily by calling the 'pauseObserver' function on the CPKeyboardStateObserver singleton instance. To check if the observing is running you can call 'isObserving' on the singleton instance which will return 'true' if the observer is running and 'false' if the observer is not running.
+
+	let keyboardObserver = CPKeyboardStateObserver.sharedObserver
+
+	if keyboardObserver.isObserving {
+       keyboardObserver.pauseObserver()
+    }
+
+
+#### Restart the observer
+
+You can restart the observer easily by calling the 'restartObserver' function on the CPKeyboardStateObserver singleton instance.
+
+	// if is not observing restart the observer
+    if !keyboardObserver.isObserving {
+        keyboardObserver.restartObserver()
+    }
+
+
