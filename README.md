@@ -115,7 +115,7 @@ You can stop the observer easily by calling the 'stopObserver' function on the C
 
 #### Pause the observer
 
-You can pause the observer easily by calling the 'pauseObserver' function on the CPKeyboardStateObserver singleton instance. To check if the observing is running you can call 'isObserving' on the singleton instance which will return 'true' if the observer is running and 'false' if the observer is not running.
+You can pause the observer easily by calling the 'pauseObserver' function on the CPKeyboardStateObserver singleton instance. To check if the observer is running you can call 'isObserving' on the singleton instance which will return 'true' if the observer is running and 'false' if the observer is not running.
 
 	let keyboardObserver = CPKeyboardStateObserver.sharedObserver
 
@@ -123,6 +123,7 @@ You can pause the observer easily by calling the 'pauseObserver' function on the
        keyboardObserver.pauseObserver()
     }
 
+When paused the observer still runs in the background listening to the keyboard event notifications to always be up to date about the current keyboard state. But the observer will not report back via the protocol or corresponding closures until the observer restarts.
 
 #### Restart the observer
 
@@ -132,5 +133,3 @@ You can restart the observer easily by calling the 'restartObserver' function on
     if !keyboardObserver.isObserving {
         keyboardObserver.restartObserver()
     }
-
-
